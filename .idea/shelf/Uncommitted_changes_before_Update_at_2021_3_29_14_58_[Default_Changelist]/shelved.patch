@@ -1,0 +1,88 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"BranchesTreeState\">\r\n    <expand>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"LOCAL_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"REMOTE_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"REMOTE_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"GROUP_NODE:origin\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n    </expand>\r\n    <select>\r\n      <path>\r\n        <item name=\"ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"LOCAL_ROOT\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n        <item name=\"BRANCH:master\" type=\"e8cecc67:BranchNodeDescriptor\" />\r\n      </path>\r\n    </select>\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e4363d73-42c6-4fb0-8aa1-7d933d673379\" name=\"Default Changelist\" comment=\"1212121\" />\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"master\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"1qBnZEEuhJgkquF8pG6lvqq33DP\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\">\r\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\r\n  </component>\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">\r\n    <property name=\"ASKED_ADD_EXTERNAL_FILES\" value=\"true\" />\r\n    <property name=\"ASKED_SHARE_PROJECT_CONFIGURATION_FILES\" value=\"true\" />\r\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\r\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$\" />\r\n    <property name=\"settings.editor.selected.configurable\" value=\"preferences.pluginManager\" />\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Python.Cerebellum\">\r\n    <configuration name=\"Cerebellum\" type=\"PythonConfigurationType\" factoryName=\"Python\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"CereSNN_gitee\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$/bindsnet/My_Coding\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"main\" type=\"PythonConfigurationType\" factoryName=\"Python\" nameIsGenerated=\"true\">\r\n      <module name=\"CereSNN\" />\r\n      <option name=\"INTERPRETER_OPTIONS\" value=\"\" />\r\n      <option name=\"PARENT_ENVS\" value=\"true\" />\r\n      <envs>\r\n        <env name=\"PYTHONUNBUFFERED\" value=\"1\" />\r\n      </envs>\r\n      <option name=\"SDK_HOME\" value=\"\" />\r\n      <option name=\"WORKING_DIRECTORY\" value=\"$PROJECT_DIR$\" />\r\n      <option name=\"IS_MODULE_SDK\" value=\"true\" />\r\n      <option name=\"ADD_CONTENT_ROOTS\" value=\"true\" />\r\n      <option name=\"ADD_SOURCE_ROOTS\" value=\"true\" />\r\n      <option name=\"SCRIPT_NAME\" value=\"$PROJECT_DIR$/main.py\" />\r\n      <option name=\"PARAMETERS\" value=\"\" />\r\n      <option name=\"SHOW_COMMAND_LINE\" value=\"false\" />\r\n      <option name=\"EMULATE_TERMINAL\" value=\"false\" />\r\n      <option name=\"MODULE_MODE\" value=\"false\" />\r\n      <option name=\"REDIRECT_INPUT\" value=\"false\" />\r\n      <option name=\"INPUT_FILE\" value=\"\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Python.Cerebellum\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e4363d73-42c6-4fb0-8aa1-7d933d673379\" name=\"Default Changelist\" comment=\"\" />\r\n      <created>1616561903507</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1616561903507</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"first time to create a project\">\r\n      <created>1616562211667</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1616562211667</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"wow gitee is fast\">\r\n      <created>1616682937394</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1616682937394</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"zhb is changing\">\r\n      <created>1616999542769</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1616999542770</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"1212121\">\r\n      <created>1616999972183</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1616999972183</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"5\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"master\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n    <option name=\"oldMeFiltersMigrated\" value=\"true\" />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <option name=\"ADD_EXTERNAL_FILES_SILENTLY\" value=\"true\" />\r\n    <MESSAGE value=\"first time to create a project\" />\r\n    <MESSAGE value=\"wow gitee is fast\" />\r\n    <MESSAGE value=\"zhb is changing\" />\r\n    <MESSAGE value=\"1212121\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"1212121\" />\r\n  </component>\r\n  <component name=\"WindowStateProjectService\">\r\n    <state x=\"464\" y=\"261\" key=\"#com.intellij.fileTypes.FileTypeChooser\" timestamp=\"1616563319414\">\r\n      <screen x=\"0\" y=\"0\" width=\"1440\" height=\"920\" />\r\n    </state>\r\n    <state x=\"464\" y=\"261\" key=\"#com.intellij.fileTypes.FileTypeChooser/0.0.1440.920@0.0.1440.920\" timestamp=\"1616563319414\" />\r\n    <state x=\"501\" y=\"202\" key=\"FileChooserDialogImpl\" timestamp=\"1616562137504\">\r\n      <screen x=\"0\" y=\"0\" width=\"1440\" height=\"920\" />\r\n    </state>\r\n    <state x=\"501\" y=\"202\" key=\"FileChooserDialogImpl/0.0.1440.920@0.0.1440.920\" timestamp=\"1616562137504\" />\r\n    <state x=\"594\" y=\"358\" width=\"445\" height=\"407\" key=\"Github.ShareDialog\" timestamp=\"1616562724619\">\r\n      <screen x=\"0\" y=\"0\" width=\"1440\" height=\"920\" />\r\n    </state>\r\n    <state x=\"594\" y=\"358\" width=\"445\" height=\"407\" key=\"Github.ShareDialog/0.0.1440.920@0.0.1440.920\" timestamp=\"1616562724619\" />\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.bottom\" timestamp=\"1616686359131\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1040\" />\r\n    </state>\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616686359131\" />\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.center\" timestamp=\"1616686359131\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1040\" />\r\n    </state>\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616686359131\" />\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.left\" timestamp=\"1616686359130\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1040\" />\r\n    </state>\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616686359130\" />\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.right\" timestamp=\"1616686359131\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1040\" />\r\n    </state>\r\n    <state width=\"1899\" height=\"282\" key=\"GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616686359131\" />\r\n    <state x=\"296\" y=\"119\" key=\"SettingsEditor\" timestamp=\"1616687387508\">\r\n      <screen x=\"0\" y=\"0\" width=\"1920\" height=\"1040\" />\r\n    </state>\r\n    <state x=\"222\" y=\"105\" key=\"SettingsEditor/0.0.1440.920@0.0.1440.920\" timestamp=\"1616562511276\" />\r\n    <state x=\"296\" y=\"119\" key=\"SettingsEditor/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616687387508\" />\r\n    <state x=\"313\" y=\"194\" key=\"Vcs.Push.Dialog.v2\" timestamp=\"1617000207080\">\r\n      <screen x=\"0\" y=\"0\" width=\"1440\" height=\"920\" />\r\n    </state>\r\n    <state x=\"313\" y=\"194\" key=\"Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920\" timestamp=\"1617000207080\" />\r\n    <state x=\"417\" y=\"219\" key=\"Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616682949523\" />\r\n    <state x=\"572\" y=\"383\" key=\"com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2\" timestamp=\"1617000185229\">\r\n      <screen x=\"0\" y=\"0\" width=\"1440\" height=\"920\" />\r\n    </state>\r\n    <state x=\"572\" y=\"383\" key=\"com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920\" timestamp=\"1617000185229\" />\r\n    <state x=\"763\" y=\"433\" key=\"com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040\" timestamp=\"1616682810965\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/workspace.xml	(revision 141a4d682d5fe7f392be00cefbde46fd383804a3)
++++ .idea/workspace.xml	(date 1617000887471)
+@@ -19,13 +19,16 @@
+     <select>
+       <path>
+         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
++        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
++        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
++        <item name="BRANCH:origin/master" type="e8cecc67:BranchNodeDescriptor" />
+       </path>
+     </select>
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="1212121" />
++    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="1212121">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+@@ -140,7 +143,14 @@
+       <option name="project" value="LOCAL" />
+       <updated>1616999972183</updated>
+     </task>
+-    <option name="localTasksCounter" value="5" />
++    <task id="LOCAL-00005" summary="1212121">
++      <created>1617000288995</created>
++      <option name="number" value="00005" />
++      <option name="presentableId" value="LOCAL-00005" />
++      <option name="project" value="LOCAL" />
++      <updated>1617000288995</updated>
++    </task>
++    <option name="localTasksCounter" value="6" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -154,7 +164,7 @@
+                   <entry key="branch">
+                     <value>
+                       <list>
+-                        <option value="master" />
++                        <option value="origin/master" />
+                       </list>
+                     </value>
+                   </entry>
+@@ -204,20 +214,28 @@
+       <screen x="0" y="0" width="1920" height="1040" />
+     </state>
+     <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1616686359131" />
++    <state x="0" y="77" key="MergeDialog" timestamp="1617000356161">
++      <screen x="0" y="0" width="1440" height="920" />
++    </state>
++    <state x="0" y="77" key="MergeDialog/0.0.1440.920@0.0.1440.920" timestamp="1617000356161" />
++    <state x="135" y="223" key="MultipleFileMergeDialog" timestamp="1617000357298">
++      <screen x="0" y="0" width="1440" height="920" />
++    </state>
++    <state x="135" y="223" key="MultipleFileMergeDialog/0.0.1440.920@0.0.1440.920" timestamp="1617000357298" />
+     <state x="296" y="119" key="SettingsEditor" timestamp="1616687387508">
+       <screen x="0" y="0" width="1920" height="1040" />
+     </state>
+     <state x="222" y="105" key="SettingsEditor/0.0.1440.920@0.0.1440.920" timestamp="1616562511276" />
+     <state x="296" y="119" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616687387508" />
+-    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1617000207080">
++    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1617000576603">
+       <screen x="0" y="0" width="1440" height="920" />
+     </state>
+-    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617000207080" />
++    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617000576603" />
+     <state x="417" y="219" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1616682949523" />
+-    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617000185229">
++    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617000887410">
+       <screen x="0" y="0" width="1440" height="920" />
+     </state>
+-    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920" timestamp="1617000185229" />
++    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920" timestamp="1617000887410" />
+     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1616682810965" />
+   </component>
+ </project>
+\ No newline at end of file
