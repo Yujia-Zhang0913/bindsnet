@@ -26,7 +26,10 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="first time to create a project" />
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="wow gitee is fast">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/README" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/README" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,7 +56,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Python.Cerebellum">
     <configuration name="Cerebellum" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -120,7 +123,14 @@
       <option name="project" value="LOCAL" />
       <updated>1616562211667</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="wow gitee is fast">
+      <created>1616682937394</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1616682937394</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -150,7 +160,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="first time to create a project" />
-    <option name="LAST_COMMIT_MESSAGE" value="first time to create a project" />
+    <MESSAGE value="wow gitee is fast" />
+    <option name="LAST_COMMIT_MESSAGE" value="wow gitee is fast" />
   </component>
   <component name="WindowStateProjectService">
     <state x="464" y="261" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1616563319414">
@@ -165,14 +176,32 @@
       <screen x="0" y="0" width="1440" height="920" />
     </state>
     <state x="594" y="358" width="445" height="407" key="Github.ShareDialog/0.0.1440.920@0.0.1440.920" timestamp="1616562724619" />
-    <state x="222" y="105" key="SettingsEditor" timestamp="1616562511276">
-      <screen x="0" y="0" width="1440" height="920" />
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom" timestamp="1616686359131">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1616686359131" />
+    <state width="1899" height="282" key="GridCell.Tab.0.center" timestamp="1616686359131">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1616686359131" />
+    <state width="1899" height="282" key="GridCell.Tab.0.left" timestamp="1616686359130">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1616686359130" />
+    <state width="1899" height="282" key="GridCell.Tab.0.right" timestamp="1616686359131">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1616686359131" />
+    <state x="296" y="119" key="SettingsEditor" timestamp="1616687387508">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="222" y="105" key="SettingsEditor/0.0.1440.920@0.0.1440.920" timestamp="1616562511276" />
-    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1616563879584">
-      <screen x="0" y="0" width="1440" height="920" />
+    <state x="296" y="119" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616687387508" />
+    <state x="417" y="219" key="Vcs.Push.Dialog.v2" timestamp="1616682949523">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1616563879584" />
+    <state x="417" y="219" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1616682949523" />
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1616682810965">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
