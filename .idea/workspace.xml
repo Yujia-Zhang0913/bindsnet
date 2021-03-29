@@ -19,15 +19,13 @@
     <select>
       <path>
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="BRANCH:origin/master" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="wow gitee is fast">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="zhb is changing">
       <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/README" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/README" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,7 +128,14 @@
       <option name="project" value="LOCAL" />
       <updated>1616682937394</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="zhb is changing">
+      <created>1616999542769</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1616999542770</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -144,7 +149,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/master" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -161,7 +166,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="first time to create a project" />
     <MESSAGE value="wow gitee is fast" />
-    <option name="LAST_COMMIT_MESSAGE" value="wow gitee is fast" />
+    <MESSAGE value="zhb is changing" />
+    <option name="LAST_COMMIT_MESSAGE" value="zhb is changing" />
   </component>
   <component name="WindowStateProjectService">
     <state x="464" y="261" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1616563319414">
@@ -197,14 +203,15 @@
     </state>
     <state x="222" y="105" key="SettingsEditor/0.0.1440.920@0.0.1440.920" timestamp="1616562511276" />
     <state x="296" y="119" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1616687387508" />
-    <state x="417" y="219" key="Vcs.Push.Dialog.v2" timestamp="1616682949523">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1616999573634">
+      <screen x="0" y="0" width="1440" height="920" />
     </state>
-    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1616563879584" />
+    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1616999573634" />
     <state x="417" y="219" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1616682949523" />
-    <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1616682810965">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1616999295700">
+      <screen x="0" y="0" width="1440" height="920" />
     </state>
+    <state x="572" y="383" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920" timestamp="1616999295700" />
     <state x="763" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1616682810965" />
   </component>
 </project>
