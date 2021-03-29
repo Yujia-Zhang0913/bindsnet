@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/CereSNN_gitee.iml" filepath="$PROJECT_DIR$/.idea/CereSNN_gitee.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Cloud.iml" filepath="$PROJECT_DIR$/.idea/Cloud.iml" />
     </modules>
   </component>
 </project>
