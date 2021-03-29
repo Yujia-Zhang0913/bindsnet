@@ -147,4 +147,5 @@ If you use BindsNET in your research, please cite the following [article](https:
 - Devdhar Patel ([email](mailto:devdharpatel@cs.umass.edu))
 
 ## License
-GNU Affero General Public License v3.0
+##############################GNU Affero General Public License v3.0
+#########################

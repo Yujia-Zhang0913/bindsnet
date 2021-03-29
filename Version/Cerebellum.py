@@ -9,7 +9,7 @@ from bindsnet.learning import MSTDP,PostPre,Hebbian
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson
 time = 1000
-network = Network(dt=1);
+network = Network(dt=1)
 
 # GR_Movement_layer = Input(n=100)
 GR_Joint_layer = Input(n=500,traces=True)
