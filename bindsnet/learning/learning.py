@@ -11,7 +11,7 @@ from ..network.topology import (
     Conv2dConnection,
     LocalConnection,
 )
-from ..utils import im2col_indices
+from ..utils import im2col_indices,Kernel,v1
 
 
 class LearningRule(ABC):
@@ -80,7 +80,7 @@ class LearningRule(ABC):
         # Bound weights.
         if (
             self.connection.wmin != -np.inf or self.connection.wmax != np.inf
-        ) and not isinstance(self, NoOp):
+        ) and not isinstance(self, NoOp):    # isinstance 判断一个对象是否是某类
             self.connection.w.clamp_(self.connection.wmin, self.connection.wmax)
 
 
@@ -183,7 +183,10 @@ class PostPre(LearningRule):
         if self.nu[0]:
             source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float()
             target_x = self.target.x.view(batch_size, -1).unsqueeze(1) * self.nu[0]
-            self.connection.w -= self.reduction(torch.bmm(source_s, target_x), dim=0)
+            self.connection.w -= self.reduction(torch.bmm(source_s, target_x), dim=0)   # 权重下降——
+
+            # 因为一般来说突触前神经元的脉冲(source.s)与突触后神经元的trace无因果关系(target.x0)
+
             del source_s, target_x
 
         # Post-synaptic update.
@@ -193,6 +196,7 @@ class PostPre(LearningRule):
             )
             source_x = self.source.x.view(batch_size, -1).unsqueeze(2)
             self.connection.w += self.reduction(torch.bmm(source_x, target_s), dim=0)
+            # 权重上升，有因果关系
             del source_x, target_s
 
         super().update()
@@ -236,6 +240,133 @@ class PostPre(LearningRule):
             )
             self.connection.w += self.nu[1] * post.view(self.connection.w.size())
 
+        super().update()
+
+class STDP(LearningRule):
+    # language=rst
+    """
+        Our STDP  LTP and LTD in thesis od Doi `10.1016/j.biosystems.2008.05.008`
+    """
+
+    def __init__(
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
+    ) -> None:
+        # language=rst
+        """
+        Constructor for ``PostPre`` learning rule.
+
+        :param connection: An ``AbstractConnection`` object whose weights the
+            ``PostPre`` learning rule will modify.
+        :param nu: !!!!!!!  [ nu_LTP nu_LTD ]
+        :param reduction: Method for reducing parameter updates along the batch
+            dimension.
+        :param weight_decay: Constant multiple to decay weights by on each iteration.
+        """
+        super().__init__(
+            connection=connection,
+            nu=nu,
+            reduction=reduction,
+            weight_decay=weight_decay,
+            **kwargs
+        )
+
+        assert (
+                self.source.traces and self.target.traces
+        ), "Both pre- and post-synaptic nodes must record spike traces."
+
+        if isinstance(connection, (Connection, LocalConnection)):
+            self.update = self._connection_update
+        elif isinstance(connection, Conv2dConnection):
+            self.update = self._conv2d_connection_update
+        else:
+            raise NotImplementedError(
+                "This learning rule is not supported for this Connection type."
+            )
+
+    def _connection_update(self, **kwargs) -> None:
+        # language=rst
+        """
+            LTP and LTD in thesis od Doi `10.1016/j.biosystems.2008.05.008`
+        """
+        batch_size = self.source.batch_size
+
+        # LTP increase the weight
+        if self.nu[0]:
+            source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float()* self.nu[0]
+            target_x = self.target.x.view(batch_size, -1).unsqueeze(1)
+            # TODO 实在不懂它这个维度，所以直接用oneslike了
+            self.connection.w += self.reduction(torch.bmm(source_s, torch.ones_like(target_x)), dim=0)  # 权重下降——
+            del source_s, target_x
+
+        # LTD decrease the weight
+        Ker = v1()   # 使用v1 的kernel
+        #if self.nu[1]:
+        #    if self.target.IO_s is 1:   # 该时刻有IO的teaching脉冲则执行积分计数
+
+               # for s_time in s_time_list:
+                    # Ker.create_result(-s_time)
+        # TODO 此处还未想好如何记录所有的GR
+
+        super().update()
+class IO_Record(LearningRule):
+    # language=rst
+    """
+        这个类型专门用于方便记录来自IO的脉冲信息。
+    """
+
+    def __init__(
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
+    ) -> None:
+        # language=rst
+        """
+        Constructor for ``PostPre`` learning rule.
+
+        :param connection: An ``AbstractConnection`` object whose weights the
+            ``PostPre`` learning rule will modify.
+        :param nu: Single or pair of learning rates for pre- and post-synaptic events.
+        :param reduction: Method for reducing parameter updates along the batch
+            dimension.
+        :param weight_decay: Constant multiple to decay weights by on each iteration.
+        """
+        super().__init__(
+            connection=connection,
+            nu=nu,
+            reduction=reduction,
+            weight_decay=weight_decay,
+            **kwargs
+        )
+
+        assert (
+                self.source.traces and self.target.traces
+        ), "Both pre- and post-synaptic nodes must record spike traces."
+
+        if isinstance(connection, (Connection, LocalConnection)):
+            self.update = self._connection_update
+        elif isinstance(connection, Conv2dConnection):
+            self.update = self._conv2d_connection_update
+        else:
+            raise NotImplementedError(
+                "This learning rule is not supported for this Connection type."
+            )
+
+    def _connection_update(self, **kwargs) -> None:
+        # language=rst
+        """
+        Post-pre learning rule for ``Connection`` subclass of ``AbstractConnection``
+        class.
+        """
+        batch_size = self.source.batch_size
+        self.target.IO_s = self.source.s   # 记录 是否有脉冲
         super().update()
 
 
