@@ -246,7 +246,7 @@ def Error2IO_Current(
     Current = torch.zeros_like(datum)
     Current_Anti = torch.zeros_like(datum)
     # norm
-    datum /= error_max
+    datum /= error_max    #归一化
 
     Current.masked_fill_(datum[0] > 0,
                          base_current+max_current*(1+torch.exp(-10*datum[0]/P_max+4))

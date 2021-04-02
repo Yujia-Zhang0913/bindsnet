@@ -16,6 +16,7 @@ pytest>=3.4.0
 pandas>=0.23.4
 tensorboardX>=1.7
 pre-commit
+math
 
 
 bindsnet~=0.2.7

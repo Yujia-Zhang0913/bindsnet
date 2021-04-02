@@ -1,5 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
+
+from bindsnet.encoding.encodings import bernoulli_RBF
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes,IO_Input
 from bindsnet.network.topology import Connection
@@ -7,18 +9,18 @@ from bindsnet.network.monitors import Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages,plot_weights
 from bindsnet.learning import MSTDP,PostPre,Hebbian
 from bindsnet.utils import Error2IO_Current
-from bindsnet.encoding import poisson
+from bindsnet.encoding import poisson, bernoulli
 
 time = 1000
-network = Network(dt=1);
+network = Network(dt=1)
 # GR_Movement_layer = Input(n=100)
-GR_Joint_layer = Input(n=500,traces=True)
-PK = LIFNodes(n=8,traces=True)
-PK_Anti = LIFNodes(n=8,traces=True)
+GR_Joint_layer = Input(n=100, traces=True)
+PK = LIFNodes(n=8, traces=True)
+PK_Anti = LIFNodes(n=8, traces=True)
 IO = IO_Input(n=8)
 IO_Anti = IO_Input(n=8)
-DCN = LIFNodes(n=100,thresh=-57,traces=True)
-DCN_Anti = LIFNodes(n=100,thresh=-57,trace=True)
+DCN = LIFNodes(n=100, thresh=-57, traces=True)
+DCN_Anti = LIFNodes(n=100, thresh=-57, trace=True)
 
 # 输入motor相关
 Parallelfiber = Connection (
@@ -124,20 +126,28 @@ network.add_monitor(monitor=PK_Anti_monitor,name="PK_Anti")
 network.add_monitor(monitor=IO_monitor,name="IO")
 network.add_monitor(monitor=DCN_monitor,name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor,name="DCN_Anti")
-data_Joint = torch.bernoulli(0.01 * torch.rand(time, GR_Joint_layer.n)).byte()
 
-# 随机生成 error(无时间维度）
-error = 0.1*torch.rand(IO.n)
-Curr_list = Error2IO_Current(error)
-print(Curr_list)
-IO_Input = poisson(Curr_list[0],time=time)
-print(IO_Input)
-IO_Anti_Input = poisson(Curr_list[1],time=time)
-inputs = {"GR_Joint_layer":data_Joint,
-          "IO":IO_Input,
-          "IO_Anti":IO_Anti_Input
+
+data_Joint = bernoulli_RBF(torch.rand(time, 1))
+    #torch.bernoulli(0.01 * torch.rand(time, GR_Joint_layer.n)).byte()
+print("a size")
+print(data_Joint.size())
+
+# 随机生成 监督信号
+supervise = 0.1*torch.rand(time)
+
+Curr_list = Error2IO_Current(supervise)
+
+IO_Input = poisson(Curr_list[0], time=time)
+IO_Anti_Input = poisson(Curr_list[1], time=time)
+
+print("b size")
+print(IO_Input.size())
+inputs = {"GR_Joint_layer": data_Joint,
+          "IO": IO_Input,
+          "IO_Anti": IO_Anti_Input
           }
-network.run(inputs=inputs,time=time)
+network.run(inputs=inputs, time=time)
 spikes = {
    # "GR": GR_monitor.get("s")
   #  "PK":PK_monitor.get("s"),

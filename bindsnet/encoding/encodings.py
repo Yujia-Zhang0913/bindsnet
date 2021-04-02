@@ -2,7 +2,7 @@ from typing import Optional
 
 import torch
 import numpy as np
-
+import math
 
 def single(
     datum: torch.Tensor,
@@ -190,3 +190,71 @@ def rank_order(
             spikes[times[i] - 1, i] = 1
 
     return spikes.reshape(time, *shape)
+
+def bernoulli_RBF(
+    datum: torch.Tensor,
+    time: Optional[int] = None,
+    dt: float = 1.0,
+    device="cpu",
+    **kwargs
+) -> torch.Tensor:
+    # language=rst
+    """
+    Generates Bernoulli-distributed spike trains based on input intensity. Inputs must
+    be non-negative. Spikes correspond to successful Bernoulli trials, with success
+    probability equal to (normalized in [0, 1]) input value.
+
+    :param datum: Tensor of shape ``[n_1, ..., n_k]``.
+    :param time: Length of Bernoulli spike train per input variable.
+    :param dt: Simulation time step.
+    :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Bernoulli-distributed spikes.
+
+    Keyword arguments:
+
+    :param float max_prob: Maximum probability of spike per Bernoulli trial.
+    """
+    # Setting kwargs.
+    # Setting kwargs.
+    max_prob = kwargs.get("max_prob", 1.0)
+    assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
+    assert (datum >= 0).all(), "Inputs must be non-negative"
+
+    #Create RBF 10Inputs
+    RBF = []  #range from the min of input to the max
+    for i in range(100):            #Adjust the number of the ner
+        RBF.append(i*0.01)
+
+    Final = []
+    Final = torch.Tensor(Final)
+    flag = 1
+    for T in range(1000):       #Time
+        RATE = []
+        for i in RBF:
+            delta_X = datum.data[T] - i
+            rate = math.exp(-(delta_X*delta_X)/2)/math.sqrt(2*math.pi)
+            RATE.append(rate)
+
+        Input = torch.Tensor(RATE)
+        print(Input)
+        Final = torch.cat((Input, Final), 0)
+
+    Final = Final.resize(1000, 100)             #Adjust the number of ner  (time, num)
+
+    shape, size = Final.shape, Final.numel()
+    #datum = datum.flatten()
+
+
+    if time is not None:
+        time = int(time / dt)
+
+    # Make spike data from Bernoulli sampling.
+    if time is None:
+        spikes = torch.bernoulli(max_prob * Final).to(device)
+        spikes = spikes.view(*shape)
+    else:
+        spikes = torch.bernoulli(max_prob * Final.repeat([time, 1]))
+        spikes = spikes.view(time, *shape)
+
+    print(spikes)
+
+    return spikes.byte()
