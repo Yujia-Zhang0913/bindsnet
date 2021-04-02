@@ -142,7 +142,8 @@ IO_Input = poisson(Curr_list[0], time=time)
 IO_Anti_Input = poisson(Curr_list[1], time=time)
 
 print("b size")
-print(IO_Input.size())
+print(IO_Input)
+
 inputs = {"GR_Joint_layer": data_Joint,
           "IO": IO_Input,
           "IO_Anti": IO_Anti_Input
