@@ -294,6 +294,155 @@ class IO_Input(Nodes, AbstractInput):
         """
         super().reset_state_variables()
 
+class LIF_Train(Nodes,AbstractInput):
+    # TODO 待完善
+    # language=rst
+    """
+    Layer of `leaky integrate-and-fire (LIF) neurons
+    <http://web.archive.org/web/20190318204706/http://icwww.epfl.ch/~gerstner/SPNM/node26.html#SECTION02311000000000000000>`_.
+    这个是自己定义的神经元，新增变量 IO_s ,用于记录IO是否有输入脉冲
+    """
+
+    def __init__(
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            rest: Union[float, torch.Tensor] = -65.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            lbound: float = None,
+            **kwargs,
+    ) -> None:
+        # language=rst
+        """
+        Instantiates a layer of LIF neurons.
+
+        :param n: The number of neurons in the layer.
+        :param shape: The dimensionality of the layer.
+        :param traces: Whether to record spike traces.
+        :param traces_additive: Whether to record spike traces additively.
+        :param tc_trace: Time constant of spike trace decay.
+        :param trace_scale: Scaling factor for spike trace.
+        :param sum_input: Whether to sum all inputs.
+        :param thresh: Spike threshold voltage.
+        :param rest: Resting membrane voltage.
+        :param reset: Post-spike reset voltage.
+        :param refrac: Refractory (non-firing) period of the neuron.   refrac period 不应期
+        :param tc_decay: Time constant of neuron voltage decay.
+        :param lbound: Lower bound of the voltage.
+        """
+        super().__init__(
+            n=n,
+            shape=shape,
+            traces=traces,
+            traces_additive=traces_additive,
+            tc_trace=tc_trace,
+            trace_scale=trace_scale,
+            sum_input=sum_input,
+        )
+
+        self.register_buffer(
+            "rest", torch.tensor(rest, dtype=torch.float)
+        )  # Rest voltage.
+        self.register_buffer(
+            "reset", torch.tensor(reset, dtype=torch.float)
+        )  # Post-spike reset voltage.
+        self.register_buffer(
+            "thresh", torch.tensor(thresh, dtype=torch.float)
+        )  # Spike threshold voltage.
+        self.register_buffer(
+            "refrac", torch.tensor(refrac)
+        )  # Post-spike refractory period.
+        self.register_buffer(
+            "tc_decay", torch.tensor(tc_decay, dtype=torch.float)
+        )  # Time constant of neuron voltage decay.
+        self.register_buffer(
+            "decay", torch.zeros(*self.shape)
+        )  # Set in compute_decays.
+        self.register_buffer("v", torch.FloatTensor())  # Neuron voltages.
+        self.register_buffer(
+            "refrac_count", torch.FloatTensor()
+        )  # Refractory period counters.
+
+        if lbound is None:
+            self.lbound = None  # Lower bound of voltage.
+        else:
+            self.lbound = torch.tensor(
+                lbound, dtype=torch.float
+            )  # Lower bound of voltage.
+
+    def forward(self, x: torch.Tensor) -> None:
+        # language=rst
+
+        """
+        Runs a single simulation step.
+
+        :param x: Inputs to the layer.
+        """
+        # Decay voltages.
+        self.v = self.decay * (self.v - self.rest) + self.rest
+
+        # Integrate inputs.
+        x.masked_fill_(self.refrac_count > 0, 0.0)  # 未 跳出不应期的输入 视为没有
+
+        # Decrement refractory counters.
+        self.refrac_count -= self.dt  # 不应期counter减少
+
+        self.v += x  # interlaced    在原先恢复的电位基础上再加一个电压（指的应该是局部电位——具有可加性的电位）
+
+        # Check for spiking neurons.
+        self.s = self.v >= self.thresh  # 得到bool的spike
+
+        # Refractoriness and voltage reset.
+        self.refrac_count.masked_fill_(self.s, self.refrac)  # 重置不应期时间
+        self.v.masked_fill_(self.s, self.reset)  # 电压恢复到静息电位
+
+        # Voltage clipping to lower bound.
+        if self.lbound is not None:  # 电压最低值
+            self.v.masked_fill_(self.v < self.lbound, self.lbound)
+
+        #  self.IO_s 记录是否有IO发送来的脉冲。
+        self.IO_s  # 这句话没有意义，仅仅表示该神经元存在一个记录IO_s的变量。
+        # self.IO_s 在IO-PK connection update 中写入, 在 GR-PK connection uodate 中使用并清零
+        super().forward(x)  # 计算 trace
+
+    def reset_state_variables(self) -> None:
+        # language=rst
+        """
+        Resets relevant state variables.
+        """
+        super().reset_state_variables()
+        self.v.fill_(self.rest)  # Neuron voltages.
+        self.refrac_count.zero_()  # Refractory period counters.
+
+    def compute_decays(self, dt) -> None:
+        # language=rst
+        """
+        Sets the relevant decays.
+        """
+        super().compute_decays(dt=dt)
+        self.decay = torch.exp(
+            -self.dt / self.tc_decay
+        )  # Neuron voltage decay (per timestep).
+
+    def set_batch_size(self, batch_size) -> None:
+        # language=rst
+        """
+        Sets mini-batch size. Called when layer is added to a network.
+
+        :param batch_size: Mini-batch size.
+        """
+        super().set_batch_size(batch_size=batch_size)
+        self.v = self.rest * torch.ones(batch_size, *self.shape, device=self.v.device)
+        self.refrac_count = torch.zeros_like(self.v, device=self.refrac_count.device)
+        self.IO_s = torch.zeros_like(self.v)
 class McCullochPitts(Nodes):
     # language=rst
     """

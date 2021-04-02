@@ -1,7 +1,8 @@
+from abc import ABC,abstractmethod
 import math
 import torch
 import numpy as np
-
+import matplotlib.pyplot as plt
 from torch import Tensor
 import torch.nn.functional as F
 from numpy import ndarray
@@ -263,6 +264,74 @@ def Error2IO_Current(
     return Out
 
 
+ # 可以选择使用的kernel
+class Kernel(ABC):
+    """
+    Abstract base class for STDP kernel.
+    """
+    def __init__(
+        self
+    )->None:
+        """
+        abstract init
+        """
+
+    @abstractmethod
+    def create_result(self,dt:float)->None:
+        """
+        abstract method
+        """
+
+
+
+class v1(Kernel):
+    """
+    Kernel in thesis
+    """
+    def __init__(
+        self
+    )->None:
+        # language=rst
+        """
+        """
+        super().__init__(
+        )
+
+    def create_result(self,dt:float)-> None:
+        self.result = math.exp(dt)-math.exp(4*dt)
+        super().create_result(dt)
+
+
+def Plot_Kernel(
+    K:Kernel,
+    xmin:float=-10,
+    xmax:float=10,
+    resolution:float = 0.01
+)->None:
+    """
+    绘制特定kernel的图像
+    """
+    plt.figure(1);
+    x = []
+    y = []
+    a = np.linspace(xmin,xmax,int((xmax-xmin)/resolution))
+    for i in a:
+        x.append(i);
+        K.create_result(dt=i)
+        y.append(K.result)
+    plt.plot(x,y)
+    plt.show()
+
+
+if  __name__ == "__main__":
+    aaa = v1()
+    Plot_Kernel(K=aaa,xmin=-4,xmax=0)
+
+#def kernel_v1(deltat:float)-> float:
+
+
+
+#def Plot_kernel()
 
 
 
