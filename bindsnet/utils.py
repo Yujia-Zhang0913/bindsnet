@@ -244,24 +244,29 @@ def Error2IO_Current(
     shape = list(datum.shape)
     print(shape)
     Out = []
-    Current = torch.zeros_like(datum)
-    Current_Anti = torch.zeros_like(datum)
+    Out_Anti = []
     # norm
-    datum /= error_max    #归一化
+    #datum /= datum.max    #归一化
 
-    Current.masked_fill_(datum[0] > 0,
-                         base_current+max_current*(1+torch.exp(-10*datum[0]/P_max+4))
-                         )
+    for i in range(1000):
+        if datum[i] > 0:
+            # TODO 电流值数量级的把控--计算公式是否需要修改
+            Current = base_current+max_current*(1+math.exp(-10*datum[i]/P_max+4))
+            Current_Anti = base_current
 
-    Current_Anti.masked_fill_(datum[0] < 0,
-                              base_current + max_current * (1 + torch.exp(10 * datum[0] / P_max + 4))
-                              )
+            Out.append(Current)
+            Out_Anti.append(Current_Anti)
+        else:
+            Current = base_current
+            Current_Anti = base_current + max_current * (1 + math.exp(10 * datum[i] / P_max + 4))
+
+            Out.append(Current)
+            Out_Anti.append(Current_Anti)
     # TODO 简化了静息状态的操作
-    Current.masked_fill_(datum <= 0,base_current)
-    Current_Anti.masked_fill_(datum >= 0, base_current)
-    Out.append(Current)
-    Out.append(Current_Anti)
-    return Out
+    Out = torch.Tensor(Out)
+    Out_Anti = torch.Tensor(Out_Anti)
+
+    return Out, Out_Anti
 
 
  # 可以选择使用的kernel
