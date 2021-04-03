@@ -25,13 +25,7 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="update">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/network/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/network/network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/utils.py" afterDir="false" />
-    </list>
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="Done with the encoding of IO (still exist some bugs)" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -237,7 +231,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617376266386</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Done with the encoding of IO (still exist some bugs)">
+      <created>1617434644913</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1617434644913</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -251,7 +252,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/master" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -276,7 +277,8 @@
     <MESSAGE value="clear the README" />
     <MESSAGE value="_" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="Done with the encoding of IO (still exist some bugs)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Done with the encoding of IO (still exist some bugs)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
