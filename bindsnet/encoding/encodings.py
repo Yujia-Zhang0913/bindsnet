@@ -3,7 +3,6 @@ from typing import Optional
 import torch
 import numpy as np
 import math
-
 def single(
     datum: torch.Tensor,
     time: int,
@@ -113,7 +112,10 @@ def poisson(
     distributions.
 
     :param datum: Tensor of shape ``[n_1, ..., n_k]``.
-    :param time: Length of Poisson spike train per input variable.
+    :param time: Length of Poisson spike train per input variable. # dt = 0.5 总时间  = 1000  ，time = 5   200->  time/dt [0 1 0 1 0]
+    #    input      0           1  2  3
+         spike [1 2 3 4 5 ]
+         lysspike   1           0  1  0
     :param dt: Simulation time step.
     :param device: target destination of poisson spikes.
     :param approx: Bool: use alternate faster, less accurate computation.
@@ -192,9 +194,10 @@ def rank_order(
     return spikes.reshape(time, *shape)
 
 def bernoulli_RBF(
-    datum: torch.Tensor,
-    time: Optional[int] = None,
-    dt: float = 1.0,
+    datum: torch.Tensor,   # [n_1]
+    neural_num: int,      # 编码的真实时间长度  time/dt
+    time: Optional[int] = None,  # number
+    dt: float = 1.0,      # result : shape [time/dt,neural_num]
     device="cpu",
     **kwargs
 ) -> torch.Tensor:
@@ -236,9 +239,9 @@ def bernoulli_RBF(
 
         Input = torch.Tensor(RATE)
         print(Input)
-        Final = torch.cat((Input, Final), 0)
+        Final = torch.cat((Input, Final), 0)  # TODO 扩充 time/dt 次
 
-    Final = Final.resize(1000, 100)             #Adjust the number of ner  (time, num)
+    Final = Final.resize(1000*time/dt, 100)             #Adjust the number of ner  (time, num)
 
     shape, size = Final.shape, Final.numel()
     #datum = datum.flatten()
@@ -258,3 +261,5 @@ def bernoulli_RBF(
     print(spikes)
 
     return spikes.byte()
+
+#TODO CURRENT_2_spike

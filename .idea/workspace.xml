@@ -25,13 +25,9 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="clear the README">
-      <change beforePath="$PROJECT_DIR$/.idea/Cloud.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Cloud.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="nodes 中添加了 LIF_train 新的神经元用于记录下来自IO的脉冲&#10;learning 中添加了 STDP 和 IO_Record&#10;utils 中添加了 kernel函数和kernel画图函数用于调试&#10;有3个TODO">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/learning/learning.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/learning/learning.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/network/nodes.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/network/nodes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,7 +214,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617086293580</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="nodes 中添加了 LIF_train 新的神经元用于记录下来自IO的脉冲&#10;learning 中添加了 STDP 和 IO_Record&#10;utils 中添加了 kernel函数和kernel画图函数用于调试&#10;有3个TODO">
+      <created>1617288670269</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1617288670269</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -255,13 +258,14 @@
     <MESSAGE value="23:01" />
     <MESSAGE value="1313" />
     <MESSAGE value="clear the README" />
-    <option name="LAST_COMMIT_MESSAGE" value="clear the README" />
+    <MESSAGE value="nodes 中添加了 LIF_train 新的神经元用于记录下来自IO的脉冲&#10;learning 中添加了 STDP 和 IO_Record&#10;utils 中添加了 kernel函数和kernel画图函数用于调试&#10;有3个TODO" />
+    <option name="LAST_COMMIT_MESSAGE" value="nodes 中添加了 LIF_train 新的神经元用于记录下来自IO的脉冲&#10;learning 中添加了 STDP 和 IO_Record&#10;utils 中添加了 kernel函数和kernel画图函数用于调试&#10;有3个TODO" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog" timestamp="1617244549530">
+    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog" timestamp="1617457897075">
       <screen x="0" y="0" width="1440" height="920" />
     </state>
-    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog/0.0.1440.920@0.0.1440.920" timestamp="1617244549530" />
+    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog/0.0.1440.920@0.0.1440.920" timestamp="1617457897075" />
     <state width="1419" height="135" key="GridCell.Tab.0.bottom" timestamp="1617283820068">
       <screen x="0" y="0" width="1440" height="920" />
     </state>
@@ -278,6 +282,10 @@
       <screen x="0" y="0" width="1440" height="920" />
     </state>
     <state width="1419" height="135" key="GridCell.Tab.0.right/0.0.1440.920@0.0.1440.920" timestamp="1617283820068" />
+    <state x="301" y="195" key="IDE.errors.dialog" timestamp="1617419310332">
+      <screen x="0" y="0" width="1440" height="920" />
+    </state>
+    <state x="301" y="195" key="IDE.errors.dialog/0.0.1440.920@0.0.1440.920" timestamp="1617419310332" />
     <state x="20" y="109" key="MergeDialog" timestamp="1617001946141">
       <screen x="0" y="0" width="1440" height="920" />
     </state>
@@ -290,15 +298,16 @@
       <screen x="0" y="0" width="1440" height="920" />
     </state>
     <state x="281" y="155" key="SettingsEditor/0.0.1440.920@0.0.1440.920" timestamp="1617243207968" />
-    <state x="305" y="115" key="Vcs.Push.Dialog.v2" timestamp="1617086362422">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="229" y="102" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617002665701" />
-    <state x="305" y="115" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1617086362422" />
-    <state x="528" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617002563479">
+    <state x="229" y="102" key="Vcs.Push.Dialog.v2" timestamp="1617288748587">
       <screen x="0" y="0" width="1440" height="920" />
     </state>
-    <state x="528" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920" timestamp="1617002563479" />
+    <state x="229" y="102" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617288748587" />
+    <state x="305" y="115" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1617086362422" />
+    <state x="528" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617419271011">
+      <screen x="0" y="0" width="1440" height="920" />
+    </state>
+    <state x="528" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920/2160.0.1920.1040@0.0.1440.920" timestamp="1617354398885" />
+    <state x="528" y="374" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920@0.0.1440.920" timestamp="1617419271011" />
     <state x="268" y="0" width="1135" height="716" maximized="true" key="dock-window-1" timestamp="1617288493558">
       <screen x="0" y="0" width="1440" height="920" />
     </state>
