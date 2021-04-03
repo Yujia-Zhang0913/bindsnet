@@ -192,9 +192,11 @@ def rank_order(
     return spikes.reshape(time, *shape)
 
 def bernoulli_RBF(
-    datum: torch.Tensor,
-    time: Optional[int] = None,
-    dt: float = 1.0,
+        # TODO 修改了输入参数
+    datum: torch.Tensor,   # [n_1]
+    neural_num: int,      # 编码的真实时间长度  time/dt
+    time: Optional[int] = None,  # number
+    dt: float = 1.0,      # result : shape [time/dt,neural_num]
     device="cpu",
     **kwargs
 ) -> torch.Tensor:
@@ -240,7 +242,7 @@ def bernoulli_RBF(
         Final = torch.cat((Input, Final), 0)
 
     Final = Final.resize(1000, 100)             #Adjust the number of ner  (time, num)
-
+    # TODO 扩充 time/dt 次
     shape, size = Final.shape, Final.numel()
     #datum = datum.flatten()
 
@@ -322,3 +324,5 @@ def poisson_IO(
 
         # TODO enable spikes  times*num of ner
         return spikes.view(time, ner)
+
+        # TODO CURRENT_2_spike
