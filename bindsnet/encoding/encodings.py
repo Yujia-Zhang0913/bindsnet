@@ -3,6 +3,7 @@ from typing import Optional
 import torch
 import numpy as np
 import math
+
 def single(
     datum: torch.Tensor,
     time: int,
@@ -112,10 +113,7 @@ def poisson(
     distributions.
 
     :param datum: Tensor of shape ``[n_1, ..., n_k]``.
-    :param time: Length of Poisson spike train per input variable. # dt = 0.5 总时间  = 1000  ，time = 5   200->  time/dt [0 1 0 1 0]
-    #    input      0           1  2  3
-         spike [1 2 3 4 5 ]
-         lysspike   1           0  1  0
+    :param time: Length of Poisson spike train per input variable.
     :param dt: Simulation time step.
     :param device: target destination of poisson spikes.
     :param approx: Bool: use alternate faster, less accurate computation.
@@ -194,10 +192,9 @@ def rank_order(
     return spikes.reshape(time, *shape)
 
 def bernoulli_RBF(
-    datum: torch.Tensor,   # [n_1]
-    neural_num: int,      # 编码的真实时间长度  time/dt
-    time: Optional[int] = None,  # number
-    dt: float = 1.0,      # result : shape [time/dt,neural_num]
+    datum: torch.Tensor,
+    time: Optional[int] = None,
+    dt: float = 1.0,
     device="cpu",
     **kwargs
 ) -> torch.Tensor:
@@ -230,6 +227,7 @@ def bernoulli_RBF(
     Final = []
     Final = torch.Tensor(Final)
     flag = 1
+
     for T in range(1000):       #Time
         RATE = []
         for i in RBF:
@@ -238,10 +236,10 @@ def bernoulli_RBF(
             RATE.append(rate)
 
         Input = torch.Tensor(RATE)
-        print(Input)
-        Final = torch.cat((Input, Final), 0)  # TODO 扩充 time/dt 次
+        #print(Input)
+        Final = torch.cat((Input, Final), 0)
 
-    Final = Final.resize(1000*time/dt, 100)             #Adjust the number of ner  (time, num)
+    Final = Final.resize(1000, 100)             #Adjust the number of ner  (time, num)
 
     shape, size = Final.shape, Final.numel()
     #datum = datum.flatten()
@@ -258,8 +256,69 @@ def bernoulli_RBF(
         spikes = torch.bernoulli(max_prob * Final.repeat([time, 1]))
         spikes = spikes.view(time, *shape)
 
-    print(spikes)
-
     return spikes.byte()
 
-#TODO CURRENT_2_spike
+def poisson_IO(
+    datum: torch.Tensor,
+    time: int,
+    dt: float = 1.0,
+    device="cpu",
+    approx=False,
+    **kwargs
+) -> torch.Tensor:
+    # language=rst
+    """
+    Generates Poisson-distributed spike trains based on input intensity. Inputs must be
+    non-negative, and give the firing rate in Hz. Inter-spike intervals (ISIs) for
+    non-negative data incremented by one to avoid zero intervals while maintaining ISI
+    distributions.
+
+    :param datum: Tensor of shape ``[n_1, ..., n_k]``.
+    :param time: Length of Poisson spike train per input variable.
+    :param dt: Simulation time step.
+    :param device: target destination of poisson spikes.
+    :param approx: Bool: use alternate faster, less accurate computation.
+    :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Poisson-distributed spikes.
+    """
+    assert (datum >= 0).all(), "Inputs must be non-negative"
+
+    # Get shape and size of data.
+    shape, size = datum.shape, datum.numel()
+    datum = datum.flatten()
+    time = int(time / dt)
+
+    if approx:
+        # random normal power awful approximation
+        x = torch.randn((time, size), device=device).abs()
+        x = torch.pow(x, (datum * 0.11 + 5) / 50)
+        y = torch.tensor(x < 0.6, dtype=torch.bool, device=device)
+
+        return y.view(time, *shape).byte()
+    else:
+        # Compute firing rates in seconds as function of data intensity,
+        # accounting for simulation time step.
+        rate = torch.zeros(size, device=device)
+        # TODO 可以再确定下firing RATE计算的依据，这里暂且做归一化处理使得RATE<1
+        # rate[datum != 0] = 1 / datum[datum != 0] * (1000 / dt)
+        rate = datum / torch.max(datum)
+
+        # Create Poisson distribution and sample inter-spike intervals
+        # (incrementing by 1 to avoid zero intervals).
+        dist = torch.distributions.Poisson(rate=rate)
+
+        ner = 8
+
+        intervals = dist.sample(sample_shape=torch.Size([ner]))    #32 refers to the num of input ner
+        intervals[:, datum != 0] += (intervals[:, datum != 0] == 0).float()
+        intervals = intervals.t()
+        # Calculate spike times by cumulatively summing over time dimension.
+        times = torch.cumsum(intervals, dim=0).long()
+        times[times >= time + 1] = 0
+        # Create tensor of spikes.
+
+        spikes = torch.zeros(time + 1, ner, device=device).byte()
+        spikes[times, torch.arange(ner)] = 1
+        spikes = spikes[1:]
+
+        # TODO enable spikes  times*num of ner
+        return spikes.view(time, ner)

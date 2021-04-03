@@ -346,6 +346,9 @@ class Network(torch.nn.Module):
         # Effective number of timesteps.
         timesteps = int(time / self.dt)
 
+        # time: 总时长，1000s
+        # dt: 仿真步长，0.2s，1s内的输入是同一值
+
         # Simulate network activity for `time` timesteps.
         for t in range(timesteps):
             # Get input to all layers (synchronous mode).
