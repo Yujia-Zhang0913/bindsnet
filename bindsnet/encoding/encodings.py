@@ -192,12 +192,11 @@ def rank_order(
     return spikes.reshape(time, *shape)
 
 def bernoulli_RBF(
-        # TODO 修改了输入参数
-    datum: torch.Tensor,   # [n_1]
-    neural_num: int,      # 编码的真实时间长度  time/dt
-    time: Optional[int] = None,  # number
-    dt: float = 1.0,      # result : shape [time/dt,neural_num]
-    device="cpu",
+    datum: torch.Tensor,                # [n_1]
+    neural_num: int,                    # GR输入细胞的个数
+    time: Optional[int] = None,         # 编码的真实时间长度
+    dt: float = 1.0,                    # 网络中仿真的长度 time/dt
+    device="cpu",                       # RESULT: shape [time/dt,neural_num]
     **kwargs
 ) -> torch.Tensor:
     # language=rst
@@ -206,6 +205,7 @@ def bernoulli_RBF(
     be non-negative. Spikes correspond to successful Bernoulli trials, with success
     probability equal to (normalized in [0, 1]) input value.
 
+    MAKE SURE THE INPUT [0,1]
     :param datum: Tensor of shape ``[n_1, ..., n_k]``.
     :param time: Length of Bernoulli spike train per input variable.
     :param dt: Simulation time step.
@@ -222,41 +222,34 @@ def bernoulli_RBF(
     assert (datum >= 0).all(), "Inputs must be non-negative"
 
     #Create RBF 10Inputs
-    RBF = []  #range from the min of input to the max
-    for i in range(100):            #Adjust the number of the ner
-        RBF.append(i*0.01)
+    RBF = []                               #range from the min of input to the max
+    for i in range(neural_num):            #Adjust the number of the ner
+        RBF.append(i / neural_num)
 
-    Final = []
-    Final = torch.Tensor(Final)
-    flag = 1
+    #  Change time from real to the network
+    if time is not None:
+        Time_network = int(time / dt)
 
-    for T in range(1000):       #Time
-        RATE = []
+    # Get the rate matrix of (time/dt, neural_num)
+    RATE = []
+    for t in range(Time_network):
         for i in RBF:
-            delta_X = datum.data[T] - i
-            rate = math.exp(-(delta_X*delta_X)/2)/math.sqrt(2*math.pi)
+            delta_X = datum.data - i
+            rate = math.exp(-(delta_X * delta_X) / 2) / math.sqrt(2 * math.pi)
             RATE.append(rate)
 
-        Input = torch.Tensor(RATE)
-        #print(Input)
-        Final = torch.cat((Input, Final), 0)
+    Final_Input = torch.Tensor(RATE)
 
-    Final = Final.resize(1000, 100)             #Adjust the number of ner  (time, num)
-    # TODO 扩充 time/dt 次
-    shape, size = Final.shape, Final.numel()
-    #datum = datum.flatten()
-
-
-    if time is not None:
-        time = int(time / dt)
+    Final_Input = Final_Input.resize(Time_network, neural_num)        #Get the rate of (time/dt, num)
+    shape, size = Final_Input.shape, Final_Input.numel()
 
     # Make spike data from Bernoulli sampling.
-    if time is None:
-        spikes = torch.bernoulli(max_prob * Final).to(device)
-        spikes = spikes.view(*shape)
-    else:
-        spikes = torch.bernoulli(max_prob * Final.repeat([time, 1]))
-        spikes = spikes.view(time, *shape)
+    spikes = torch.bernoulli(max_prob * Final_Input).to(device)
+    spikes = spikes.view(*shape)
+
+    print("----The encoding of Input variable during (time / dt)----")
+    print(spikes)
+    print(spikes.size())
 
     return spikes.byte()
 
@@ -325,4 +318,74 @@ def poisson_IO(
         # TODO enable spikes  times*num of ner
         return spikes.view(time, ner)
 
-        # TODO CURRENT_2_spike
+def IO_Current2spikes(
+    Current: torch.Tensor,
+    neural_num: int,
+    time: int,
+    dt: float = 1.0,
+    device="cpu",
+    approx=False,
+    **kwargs
+) -> torch.Tensor:
+
+    # language=rst
+    """
+    Generates Bernoulli-distributed spike trains based on input intensity. Inputs must
+    be non-negative. Spikes correspond to successful Bernoulli trials, with success
+    probability equal to (normalized in [0, 1]) input value.
+
+    MAKE SURE THE INPUT [0,1]
+    :param datum: Tensor of shape ``[n_1, ..., n_k]``.
+    :param time: Length of Bernoulli spike train per input variable.
+    :param dt: Simulation time step.
+    :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Bernoulli-distributed spikes.
+
+    Keyword arguments:
+
+    :param float max_prob: Maximum probability of spike per Bernoulli trial.
+    """
+    # Setting kwargs.
+    # Setting kwargs.
+    max_prob = kwargs.get("max_prob", 1.0)
+    assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
+    assert (Current >= 0).all(), "Inputs must be non-negative"
+
+    #  Change time from real to the network
+    if time is not None:
+        Time_network = int(time / dt)
+
+    # Assume "Current" belongs to (0,1)
+    rate = Current
+
+    # Create Poisson distribution and sample inter-spike intervals
+
+    Final_spike = []
+    Final_spike = torch.tensor(Final_spike)
+
+    # TODO append不能加入重复元素导致维度不一样
+    for t in range(Time_network):
+        spike = np.zeros(neural_num)
+
+        for i in range(neural_num):
+            ref = torch.rand(1)
+            if Current > ref:
+                spike[i] = 1
+            else:
+                spike[i] = 0
+
+        spike = torch.Tensor(spike)
+        Final_spike = torch.cat((spike, Final_spike), 0)
+
+
+    Final_spike = Final_spike.resize(Time_network, neural_num)
+
+    print("----The encoding of Input supervisor during (time / dt)----")
+    print(Final_spike)
+    print(Final_spike.size())
+
+    return Final_spike.byte()
+
+
+
+
+

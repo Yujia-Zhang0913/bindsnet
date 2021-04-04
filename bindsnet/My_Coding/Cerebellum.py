@@ -1,7 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 
-from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO
+from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes, IO_Input
 from bindsnet.network.topology import Connection
@@ -127,23 +127,23 @@ network.add_monitor(monitor=IO_monitor, name="IO")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
 
+#单次网络输入测试
+time = 5
+dt = 0.2
 
-data_Joint = bernoulli_RBF(torch.rand(time, 1))
-#torch.bernoulli(0.01 * torch.rand(time, GR_Joint_layer.n)).byte()
+# 输入信号编码测试
+neu_GR = 100
+a = torch.Tensor([0.5])
+data_Joint = bernoulli_RBF(a, neu_GR, time, dt)                    # Input_DATA, neural_num, time, dt
 
-# 随机生成 监督信号
-supervise = 0.001*torch.rand(time)
+# 监督信号编码测试
+neu_IO = 32
+supervise = torch.Tensor([0.1])
+## 根据监督信号生成电流值 相同监督相同电流
+Curr, Curr_Anti = Error2IO_Current(supervise)
+IO_Input = IO_Current2spikes(Curr, neu_IO, time, dt)               # Supervise_DATA, neural_num, time, dt
+IO_Anti_Input = IO_Current2spikes(Curr_Anti, neu_IO, time, dt)
 
-# 根据监督信号生成电流值 相同监督相同电流
-Curr_list, Curr_list_Anti = Error2IO_Current(supervise)
-
-IO_Input = poisson_IO(Curr_list, time=time)
-IO_Anti_Input = poisson_IO(Curr_list_Anti, time=time)
-
-print(IO_Input)
-print(IO_Input.size())
-print(IO_Anti_Input)
-print(IO_Anti_Input.size())
 
 inputs = {"GR_Joint_layer": data_Joint,
           "IO": IO_Input,

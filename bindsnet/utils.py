@@ -224,7 +224,7 @@ def Error2IO_Current(
         base_current: float = 0.15,
         error_max: float = 10,
         # TODO  how to normalize and whether to add P_max parameter
-        P_max:float = 6
+        P_max:float = 10
 ) -> list:
     """
     将error 以一定规则转化为输入到IO当中的电流信号。（未经过编码的）
@@ -241,32 +241,33 @@ def Error2IO_Current(
     :return list={ current,current_anti}
 
     """
-    shape = list(datum.shape)
-    print(shape)
-    Out = []
-    Out_Anti = []
-    # norm
-    #datum /= datum.max    #归一化
+    if datum.data > 0:
+        # TODO 电流值数量级的把控--计算公式是否需要修改
+        # 公式是想当然的 但是在数值上比较合理  --lys
+        Current = base_current + (max_current - base_current)*math.exp(- datum.data / P_max)
+        Current_Anti = base_current
 
-    for i in range(1000):
-        if datum[i] > 0:
-            # TODO 电流值数量级的把控--计算公式是否需要修改
-            Current = base_current+max_current*(1+math.exp(-10*datum[i]/P_max+4))
-            Current_Anti = base_current
+        #归一化 同时进行Tensor格式的转换
+        Current = torch.Tensor([Current / max_current])
+        Current_Anti = torch.Tensor([Current_Anti / max_current])
 
-            Out.append(Current)
-            Out_Anti.append(Current_Anti)
-        else:
-            Current = base_current
-            Current_Anti = base_current + max_current * (1 + math.exp(10 * datum[i] / P_max + 4))
+    else:
+        # TODO Anti的电流公式
+        Current = base_current
+        Current_Anti = base_current + (max_current - base_current) * math.exp(- datum.data / P_max)
 
-            Out.append(Current)
-            Out_Anti.append(Current_Anti)
+        # 归一化 同时进行Tensor格式的转换
+        Current = torch.Tensor([Current / max_current])
+        Current_Anti = torch.Tensor([Current_Anti / max_current])
+
     # TODO 简化了静息状态的操作
-    Out = torch.Tensor(Out)
-    Out_Anti = torch.Tensor(Out_Anti)
+    print("----The result of error to current----")
+    print("Current : ")
+    print(Current)
+    print("Current_Anti : ")
+    print(Current_Anti)
 
-    return Out, Out_Anti
+    return Current, Current_Anti
 
 
  # 可以选择使用的kernel
