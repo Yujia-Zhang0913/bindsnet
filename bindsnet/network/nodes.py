@@ -284,7 +284,7 @@ class IO_Input(Nodes, AbstractInput):
         # Set spike occurrences to input values.
         eps = torch.rand(self.shape)
         self.s.masked_fill_((x-eps)>0,1)
-       # print(self.s)
+        # print(self.s)
         super().forward(x)
 
     def reset_state_variables(self) -> None:
@@ -295,7 +295,6 @@ class IO_Input(Nodes, AbstractInput):
         super().reset_state_variables()
 
 class LIF_Train(Nodes,AbstractInput):
-    # TODO 待完善
     # language=rst
     """
     Layer of `leaky integrate-and-fire (LIF) neurons
@@ -386,13 +385,10 @@ class LIF_Train(Nodes,AbstractInput):
 
         :param x: Inputs to the layer.
         """
-        # Decay voltages.
         self.v = self.decay * (self.v - self.rest) + self.rest
 
-        # Integrate inputs.
-        x.masked_fill_(self.refrac_count > 0, 0.0)  # 未 跳出不应期的输入 视为没有
-
         # Decrement refractory counters.
+        x.masked_fill_(self.refrac_count > 0, 0.0)  # 未 跳出不应期的输入 视为没有
         self.refrac_count -= self.dt  # 不应期counter减少
 
         self.v += x  # interlaced    在原先恢复的电位基础上再加一个电压（指的应该是局部电位——具有可加性的电位）
@@ -411,6 +407,8 @@ class LIF_Train(Nodes,AbstractInput):
         #  self.IO_s 记录是否有IO发送来的脉冲。
         self.IO_s  # 这句话没有意义，仅仅表示该神经元存在一个记录IO_s的变量。
         # self.IO_s 在IO-PK connection update 中写入, 在 GR-PK connection uodate 中使用并清零
+
+
         super().forward(x)  # 计算 trace
 
     def reset_state_variables(self) -> None:

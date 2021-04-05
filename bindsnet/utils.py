@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from torch import Tensor
 import torch.nn.functional as F
 from numpy import ndarray
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 from torch.nn.modules.utils import _pair
 
 
@@ -283,7 +283,7 @@ class Kernel(ABC):
         """
 
     @abstractmethod
-    def create_result(self,dt:float)->None:
+    def create_result(self,delta_t:Optional[Union[float, Tensor]])->None:
         """
         abstract method
         """
@@ -293,6 +293,7 @@ class Kernel(ABC):
 class v1(Kernel):
     """
     Kernel in thesis
+    Now support both float and Tensor input
     """
     def __init__(
         self
@@ -303,9 +304,12 @@ class v1(Kernel):
         super().__init__(
         )
 
-    def create_result(self,dt:float)-> None:
-        self.result = math.exp(dt)-math.exp(4*dt)
-        super().create_result(dt)
+    def create_result(self,delta_t:Optional[Union[float, Tensor]])-> None:
+        if isinstance(delta_t,float):
+            self.result = math.exp(delta_t) - math.exp(4 * delta_t)
+        else:
+            self.result = torch.exp(delta_t)-torch.exp(4*delta_t)
+        super().create_result(delta_t)
 
 
 def Plot_Kernel(
@@ -323,7 +327,7 @@ def Plot_Kernel(
     a = np.linspace(xmin,xmax,int((xmax-xmin)/resolution))
     for i in a:
         x.append(i);
-        K.create_result(dt=i)
+        K.create_result(delta_t=i)
         y.append(K.result)
     plt.plot(x,y)
     plt.show()

@@ -25,10 +25,16 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="Done with the encoding of IO (still exist some bugs)">
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="encoding 中确定了伯努利编码的具体形式">
+      <change beforePath="$PROJECT_DIR$/.idea/Cloud.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Cloud.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2021_3_29_14_58__Default_Changelist_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2021_3_29_14_58__Default_Changelist_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/learning/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/learning/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/learning/learning.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/learning/learning.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/network/nodes.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/network/nodes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,7 +73,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\LYS\Desktop\Cloud\venv\Scripts\python.exe" />
+      <option name="SDK_HOME" value="D:\Anaconda\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bindsnet/My_Coding" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -109,9 +115,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="D:\Anaconda\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bindsnet" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bindsnet/utils.py" />
@@ -123,6 +129,11 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.Cerebellum" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.utils" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.utils" />
@@ -236,7 +247,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617376266386</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="encoding 中确定了伯努利编码的具体形式">
+      <created>1617458432709</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1617458432709</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -275,16 +293,105 @@
     <MESSAGE value="clear the README" />
     <MESSAGE value="_" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="encoding 中确定了伯努利编码的具体形式" />
+    <option name="LAST_COMMIT_MESSAGE" value="encoding 中确定了伯努利编码的具体形式" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617628416433">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617628416433" />
+    <state x="124" y="105" width="1674" height="831" key="DiffContextDialog" timestamp="1617621554862">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2284" y="105" width="1674" height="831" key="DiffContextDialog/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617612462980" />
+    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog/0.0.1440.920@0.0.1440.920" timestamp="1617458353476" />
+    <state x="124" y="105" width="1674" height="831" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617621554862" />
+    <state width="1899" height="325" key="GridCell.Tab.0.bottom" timestamp="1617638914315">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1419" height="251" key="GridCell.Tab.0.bottom/0.0.1440.920@0.0.1440.920" timestamp="1617458541844" />
+    <state width="1899" height="325" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617638914315" />
+    <state width="1899" height="325" key="GridCell.Tab.0.center" timestamp="1617638914315">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1419" height="251" key="GridCell.Tab.0.center/0.0.1440.920@0.0.1440.920" timestamp="1617458541844" />
+    <state width="1899" height="325" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617638914315" />
+    <state width="1899" height="325" key="GridCell.Tab.0.left" timestamp="1617638914315">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1419" height="251" key="GridCell.Tab.0.left/0.0.1440.920@0.0.1440.920" timestamp="1617458541843" />
+    <state width="1899" height="325" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617638914315" />
+    <state width="1899" height="325" key="GridCell.Tab.0.right" timestamp="1617638914315">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1419" height="251" key="GridCell.Tab.0.right/0.0.1440.920@0.0.1440.920" timestamp="1617458541844" />
+    <state width="1899" height="325" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617638914315" />
+    <state width="1899" height="297" key="GridCell.Tab.1.bottom" timestamp="1617637878405">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="297" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
+    <state width="1899" height="297" key="GridCell.Tab.1.center" timestamp="1617637878405">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="297" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
+    <state width="1899" height="297" key="GridCell.Tab.1.left" timestamp="1617637878405">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="297" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
+    <state width="1899" height="297" key="GridCell.Tab.1.right" timestamp="1617637878405">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="297" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
+    <state x="540" y="254" key="IDE.errors.dialog" timestamp="1617626729662">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="254" key="IDE.errors.dialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617626729662" />
+    <state x="2425" y="150" key="MergeDialog" timestamp="1617564733449">
+      <screen x="2160" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2425" y="150" key="MergeDialog/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617564733449" />
+    <state x="357" y="221" key="MultipleFileMergeDialog" timestamp="1617458166478">
+      <screen x="0" y="0" width="1440" height="920" />
+    </state>
+    <state x="357" y="221" key="MultipleFileMergeDialog/0.0.1440.920@0.0.1440.920" timestamp="1617458166478" />
+    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1617458445069">
+      <screen x="0" y="0" width="1440" height="920" />
+    </state>
+    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617458445069" />
+    <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1617637840258">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1617637840258" />
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog" timestamp="1617637877066">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617637877066" />
+    <state x="2923" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617564690019">
+      <screen x="2160" y="0" width="1920" height="1040" />
+    </state>
+    <state x="2923" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617564690019" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1617637938288">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1617637938288" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bindsnet/network/topology.py</url>
-          <option name="timeStamp" value="2" />
+          <url>file://$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py</url>
+          <line>151</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
     </breakpoint-manager>
   </component>
 </project>

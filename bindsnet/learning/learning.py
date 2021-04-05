@@ -11,7 +11,7 @@ from ..network.topology import (
     Conv2dConnection,
     LocalConnection,
 )
-from ..utils import im2col_indices,Kernel,v1
+from ..utils import im2col_indices, Kernel, v1
 
 
 class LearningRule(ABC):
@@ -21,12 +21,12 @@ class LearningRule(ABC):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -79,8 +79,8 @@ class LearningRule(ABC):
 
         # Bound weights.
         if (
-            self.connection.wmin != -np.inf or self.connection.wmax != np.inf
-        ) and not isinstance(self, NoOp):    # isinstance 判断一个对象是否是某类
+                self.connection.wmin != -np.inf or self.connection.wmax != np.inf
+        ) and not isinstance(self, NoOp):  # isinstance 判断一个对象是否是某类
             self.connection.w.clamp_(self.connection.wmin, self.connection.wmax)
 
 
@@ -91,12 +91,12 @@ class NoOp(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -132,12 +132,12 @@ class PostPre(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -159,7 +159,7 @@ class PostPre(LearningRule):
         )
 
         assert (
-            self.source.traces and self.target.traces
+                self.source.traces and self.target.traces
         ), "Both pre- and post-synaptic nodes must record spike traces."
 
         if isinstance(connection, (Connection, LocalConnection)):
@@ -182,9 +182,11 @@ class PostPre(LearningRule):
         # Pre-synaptic update.
         if self.nu[0]:
             source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float()
+            print(source_s.shape)
             target_x = self.target.x.view(batch_size, -1).unsqueeze(1) * self.nu[0]
-            self.connection.w -= self.reduction(torch.bmm(source_s, target_x), dim=0)   # 权重下降——
-
+            print(target_x.shape)
+            self.connection.w -= self.reduction(torch.bmm(source_s, target_x), dim=0)  # 权重下降——
+            print(torch.bmm(source_s, target_x).shape)
             # 因为一般来说突触前神经元的脉冲(source.s)与突触后神经元的trace无因果关系(target.x0)
 
             del source_s, target_x
@@ -192,7 +194,7 @@ class PostPre(LearningRule):
         # Post-synaptic update.
         if self.nu[1]:
             target_s = (
-                self.target.s.view(batch_size, -1).unsqueeze(1).float() * self.nu[1]
+                    self.target.s.view(batch_size, -1).unsqueeze(1).float() * self.nu[1]
             )
             source_x = self.source.x.view(batch_size, -1).unsqueeze(2)
             self.connection.w += self.reduction(torch.bmm(source_x, target_s), dim=0)
@@ -242,6 +244,7 @@ class PostPre(LearningRule):
 
         super().update()
 
+
 class STDP(LearningRule):
     # language=rst
     """
@@ -253,6 +256,7 @@ class STDP(LearningRule):
             connection: AbstractConnection,
             nu: Optional[Union[float, Sequence[float]]] = None,
             reduction: Optional[callable] = None,
+            time_max: float = 5,
             weight_decay: float = 0.0,
             **kwargs
     ) -> None:
@@ -274,6 +278,7 @@ class STDP(LearningRule):
             weight_decay=weight_decay,
             **kwargs
         )
+        self.time_max = time_max  # make it as an attribute of STDP
 
         assert (
                 self.source.traces and self.target.traces
@@ -287,32 +292,60 @@ class STDP(LearningRule):
             raise NotImplementedError(
                 "This learning rule is not supported for this Connection type."
             )
+        self.s_record = []
 
     def _connection_update(self, **kwargs) -> None:
         # language=rst
         """
-            LTP and LTD in thesis od Doi `10.1016/j.biosystems.2008.05.008`
+            LTP and LTD in thesis of Doi `10.1016/j.biosystems.2008.05.008`
         """
         batch_size = self.source.batch_size
 
+        # record the every spike created by the GR along time span
+        x_time = torch.zeros_like(self.source.s)
+        x_time = x_time.float()
+        x_time.masked_fill_(self.source.s > 0, 1)
+        self.s_record.append(x_time)  # load and record
+        # pop the record whose real time from now > time/max
+        if len(self.s_record) > int(self.time_max / self.connection.dt):
+            self.s_record.pop(0)
+        index = 0
+        record_len = len(self.s_record)
+        # turn every 1 to an integer represents the time eg: [ 1 0 1] ---> [3dt 0 1dt]
+        for s_r in self.s_record:
+            # the end of list fill in 1, the last one fill in 2
+            s_r.masked_fill_(s_r > 0, (record_len - index) * self.connection.dt)
+            index += 1
+
         # LTP increase the weight
         if self.nu[0]:
-            source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float()* self.nu[0]
+            source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float() * self.nu[0]
             target_x = self.target.x.view(batch_size, -1).unsqueeze(1)
-            # TODO 实在不懂它这个维度，所以直接用oneslike了
             self.connection.w += self.reduction(torch.bmm(source_s, torch.ones_like(target_x)), dim=0)  # 权重下降——
             del source_s, target_x
 
         # LTD decrease the weight
-        Ker = v1()   # 使用v1 的kernel
-        #if self.nu[1]:
-        #    if self.target.IO_s is 1:   # 该时刻有IO的teaching脉冲则执行积分计数
+        Ker = v1()
+        if self.nu[1]:
+            # calculate the kernel sum
+            kernel_sum = torch.zeros_like(self.s_record[0])
+            for s_r in self.s_record:
+                Ker.create_result(-1 * s_r)
+                kernel_sum += Ker.result
+            kernel_x = kernel_sum.view(batch_size, -1).unsqueeze(2).float() * self.nu[1]
+            print(kernel_x.shape)
+            source_s = self.target.IO_s.view(batch_size, -1).unsqueeze(1).float()
+            print(source_s.shape)
+            # 权重下降——
+            print(torch.bmm(kernel_x, source_s).shape)
+            self.connection.w -= self.reduction(torch.bmm(kernel_x, source_s), dim=0)
+            del source_s, kernel_x, kernel_sum
 
-               # for s_time in s_time_list:
-                    # Ker.create_result(-s_time)
-        # TODO 此处还未想好如何记录所有的GR
-
+        # clear all spike record for target.IO_s:
+        self.target.IO_s.masked_fill_(self.target.IO_s != 0, 0)
         super().update()
+
+
 class IO_Record(LearningRule):
     # language=rst
     """
@@ -346,10 +379,6 @@ class IO_Record(LearningRule):
             **kwargs
         )
 
-        assert (
-                self.source.traces and self.target.traces
-        ), "Both pre- and post-synaptic nodes must record spike traces."
-
         if isinstance(connection, (Connection, LocalConnection)):
             self.update = self._connection_update
         elif isinstance(connection, Conv2dConnection):
@@ -366,7 +395,7 @@ class IO_Record(LearningRule):
         class.
         """
         batch_size = self.source.batch_size
-        self.target.IO_s = self.source.s   # 记录 是否有脉冲
+        self.target.IO_s = self.source.s  # 记录 是否有脉冲
         super().update()
 
 
@@ -379,12 +408,12 @@ class WeightDependentPostPre(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -407,7 +436,7 @@ class WeightDependentPostPre(LearningRule):
 
         assert self.source.traces, "Pre-synaptic nodes must record spike traces."
         assert (
-            connection.wmin != -np.inf and connection.wmax != np.inf
+                connection.wmin != -np.inf and connection.wmax != np.inf
         ), "Connection must define finite wmin and wmax."
 
         self.wmin = connection.wmin
@@ -489,9 +518,9 @@ class WeightDependentPostPre(LearningRule):
                 torch.bmm(target_x, source_s.permute((0, 2, 1))), dim=0
             )
             update -= (
-                self.nu[0]
-                * pre.view(self.connection.w.size())
-                * (self.connection.w - self.wmin)
+                    self.nu[0]
+                    * pre.view(self.connection.w.size())
+                    * (self.connection.w - self.wmin)
             )
 
         # Post-synaptic update.
@@ -500,9 +529,9 @@ class WeightDependentPostPre(LearningRule):
                 torch.bmm(target_s, source_x.permute((0, 2, 1))), dim=0
             )
             update += (
-                self.nu[1]
-                * post.view(self.connection.w.size())
-                * (self.wmax - self.connection.wmin)
+                    self.nu[1]
+                    * post.view(self.connection.w.size())
+                    * (self.wmax - self.connection.wmin)
             )
 
         self.connection.w += update
@@ -517,12 +546,12 @@ class Hebbian(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -544,7 +573,7 @@ class Hebbian(LearningRule):
         )
 
         assert (
-            self.source.traces and self.target.traces
+                self.source.traces and self.target.traces
         ), "Both pre- and post-synaptic nodes must record spike traces."
 
         if isinstance(connection, (Connection, LocalConnection)):
@@ -622,12 +651,12 @@ class MSTDP(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -810,12 +839,12 @@ class MSTDPET(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -903,7 +932,7 @@ class MSTDPET(LearningRule):
 
         # Compute weight update.
         self.connection.w += (
-            self.nu[0] * self.connection.dt * reward * self.eligibility_trace
+                self.nu[0] * self.connection.dt * reward * self.eligibility_trace
         )
 
         # Update P^+ and P^- values.
@@ -1014,12 +1043,12 @@ class Rmax(LearningRule):
     """
 
     def __init__(
-        self,
-        connection: AbstractConnection,
-        nu: Optional[Union[float, Sequence[float]]] = None,
-        reduction: Optional[callable] = None,
-        weight_decay: float = 0.0,
-        **kwargs
+            self,
+            connection: AbstractConnection,
+            nu: Optional[Union[float, Sequence[float]]] = None,
+            reduction: Optional[callable] = None,
+            weight_decay: float = 0.0,
+            **kwargs
     ) -> None:
         # language=rst
         """
@@ -1049,7 +1078,7 @@ class Rmax(LearningRule):
 
         # Trace is needed for computing epsilon.
         assert (
-            self.source.traces and self.source.traces_additive
+                self.source.traces and self.source.traces_additive
         ), "Pre-synaptic nodes must use additive spike traces."
 
         # Derivation of R-max depends on stochastic SRM neurons!
@@ -1096,9 +1125,9 @@ class Rmax(LearningRule):
         # New eligibility trace.
         self.eligibility_trace *= 1 - self.connection.dt / self.tc_e_trace
         self.eligibility_trace += (
-            target_s
-            - (target_s_prob / (1.0 + self.tc_c / self.connection.dt * target_s_prob))
-        ) * source_x[:, None]
+                                          target_s
+                                          - (target_s_prob / (1.0 + self.tc_c / self.connection.dt * target_s_prob))
+                                  ) * source_x[:, None]
 
         # Compute weight update.
         self.connection.w += self.nu[0] * reward * self.eligibility_trace
