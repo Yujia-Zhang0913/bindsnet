@@ -7,4 +7,6 @@ from .learning import (
     MSTDP,
     MSTDPET,
     Rmax,
+    STDP,
+    IO_Record
 )
