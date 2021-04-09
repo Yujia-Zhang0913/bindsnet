@@ -318,7 +318,7 @@ class STDP(LearningRule):
         if self.nu[0]:
             source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float() * self.nu[0]
             target_x = self.target.x.view(batch_size, -1).unsqueeze(1)
-            #self.connection.w += self.reduction(torch.bmm(source_s, torch.ones_like(target_x)), dim=0)  # 权重下降——
+            self.connection.w += self.reduction(torch.bmm(source_s, torch.ones_like(target_x)), dim=0)  # 权重下降——
             del source_s, target_x
 
         # LTD decrease the weight
@@ -332,7 +332,7 @@ class STDP(LearningRule):
             kernel_x = kernel_sum.view(batch_size, -1).unsqueeze(2).float() * self.nu[1]
             source_s = self.target.IO_s.view(batch_size, -1).unsqueeze(1).float()
             # 权重下降——
-            #self.connection.w -= self.reduction(torch.bmm(kernel_x, source_s), dim=0)
+            self.connection.w -= self.reduction(torch.bmm(kernel_x, source_s), dim=0)
             del source_s, kernel_x, kernel_sum
 
         # clear all spike record for target.IO_s:

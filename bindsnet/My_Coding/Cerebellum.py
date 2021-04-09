@@ -15,10 +15,10 @@ time = 50
 network = Network(dt=0.1)
 # GR_Movement_layer = Input(n=100)
 GR_Joint_layer = Input(n=100, traces=True)
-PK = LIF_Train(n=8, traces=True,refrac=0,thresh=-40)
-PK_Anti = LIF_Train(n=8, traces=True,refrac=0,thresh=-40)
-IO = Input(n=8,traces=True)
-IO_Anti = Input(n=8,traces=True)
+PK = LIF_Train(n=32, traces=True,refrac=0,thresh=-40)
+PK_Anti = LIF_Train(n=32, traces=True,refrac=0,thresh=-40)
+IO = Input(n=32,traces=True)
+IO_Anti = Input(n=32,traces=True)
 DCN = LIFNodes(n=100, thresh=-57, traces=True)
 DCN_Anti = LIFNodes(n=100, thresh=-57, trace=True)
 
@@ -150,13 +150,13 @@ dt = 0.1
 
 # 输入信号编码测试
 neu_GR = 100
-a = torch.Tensor([0.001])
+a = torch.Tensor([0.5])
 data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)                    # Input_DATA, neural_num, time, dt
 print("data_Joint")
 print(data_Joint)
 # 监督信号编码测试
-neu_IO = 8
-supervise = torch.Tensor([0.9])
+neu_IO = 32
+supervise = torch.Tensor([0.1])
 ## 根据监督信号生成电流值 相同监督相同电流
 Curr, Curr_Anti = Error2IO_Current(supervise)
 print(Curr)
@@ -171,9 +171,9 @@ inputs = {
           "IO_Anti": IO_Anti_Input
           }
 
+for i in range(1):
+    network.run(inputs=inputs, time=time)
 
-# for i in range(10):
-network.run(inputs=inputs, time=50)
 
 spikes = {
     "GR": GR_monitor.get("s"),
