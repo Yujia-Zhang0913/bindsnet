@@ -87,7 +87,6 @@ class EnvironmentPipeline(BasePipeline):
                 device=self.device,
             )
         self.overlay_start = True
-
         if self.reward_delay is not None:
             assert self.reward_delay > 0
             self.rewards = torch.zeros(self.reward_delay)

@@ -182,11 +182,8 @@ class PostPre(LearningRule):
         # Pre-synaptic update.
         if self.nu[0]:
             source_s = self.source.s.view(batch_size, -1).unsqueeze(2).float()
-            print(source_s.shape)
             target_x = self.target.x.view(batch_size, -1).unsqueeze(1) * self.nu[0]
-            print(target_x.shape)
             self.connection.w -= self.reduction(torch.bmm(source_s, target_x), dim=0)  # 权重下降——
-            print(torch.bmm(source_s, target_x).shape)
             # 因为一般来说突触前神经元的脉冲(source.s)与突触后神经元的trace无因果关系(target.x0)
 
             del source_s, target_x
@@ -333,11 +330,8 @@ class STDP(LearningRule):
                 Ker.create_result(-1 * s_r)
                 kernel_sum += Ker.result
             kernel_x = kernel_sum.view(batch_size, -1).unsqueeze(2).float() * self.nu[1]
-            print(kernel_x.shape)
             source_s = self.target.IO_s.view(batch_size, -1).unsqueeze(1).float()
-            print(source_s.shape)
             # 权重下降——
-            print(torch.bmm(kernel_x, source_s).shape)
             self.connection.w -= self.reduction(torch.bmm(kernel_x, source_s), dim=0)
             del source_s, kernel_x, kernel_sum
 
@@ -394,8 +388,9 @@ class IO_Record(LearningRule):
         Post-pre learning rule for ``Connection`` subclass of ``AbstractConnection``
         class.
         """
-        batch_size = self.source.batch_size
-        self.target.IO_s = self.source.s  # 记录 是否有脉冲
+        # TODO 记住Tensor直接复制 指向了相同的内从空间
+        self.target.IO_s = self.source.s.clone()  # 记录 是否有脉冲，一定要有clone
+
         super().update()
 
 
