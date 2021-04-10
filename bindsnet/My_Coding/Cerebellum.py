@@ -149,6 +149,7 @@ inputs = {"GR_Joint_layer": data_Joint,
 
 
 # for i in range(10):
+print(network)
 network.run(inputs=inputs, time=1000)
 
 spikes = {
