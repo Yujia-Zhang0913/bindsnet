@@ -26,27 +26,12 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="Done with the STDP.&amp; Update the Kernel function,now Kernel function supports both Tensor and float as input.&#10;Their is not TODO in learning now! wow!">
-      <change afterPath="$PROJECT_DIR$/Try_me.m" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/actuator.slx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/actuator.slx.autosave" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/actuator.slxc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actuator/checksumOfCache.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actuator/tmwinternal/simulink_cache.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actuator/varInfo.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/checksumOfCache.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/tmwinternal/simulink_cache.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/varInfo.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sscfluids_antagonistic_mckibben_actuator.slxc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2021_3_29_14_58_[Default_Changelist]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2021_3_29_14_58__Default_Changelist_.xml" beforeDir="false" />
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="nothing important just commit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/analysis/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/analysis/plotting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/environment/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/environment/environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/learning/learning.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/learning/learning.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +46,14 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="1qBnZEEuhJgkquF8pG6lvqq33DP" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -74,7 +67,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
   </component>
   <component name="RunManager" selected="Python.Cerebellum">
     <configuration name="Cerebellum" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
@@ -84,7 +77,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="D:\Anaconda\python.exe" />
+      <option name="SDK_HOME" value="C:\Users\LYS\Desktop\Cloud\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bindsnet/My_Coding" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -148,11 +141,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$USER_HOME$/Desktop/pytest.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../pytest.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -365,7 +358,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/change" />
+                        <option value="origin/master" />
                       </list>
                     </value>
                   </entry>
@@ -394,117 +387,6 @@
     <MESSAGE value="fix the IO_record&amp;STDP learning bug" />
     <option name="LAST_COMMIT_MESSAGE" value="fix the IO_record&amp;STDP learning bug" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="199" y="155" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617672027351">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="199" y="155" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.920@0.0.1440.920" timestamp="1617672027351" />
-    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617628416433" />
-    <state width="1219" height="466" key="DebuggerActiveHint" timestamp="1617766795985">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1219" height="466" key="DebuggerActiveHint/0.0.1440.920@0.0.1440.920" timestamp="1617766795985" />
-    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog" timestamp="1617672237820">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="2284" y="105" width="1674" height="831" key="DiffContextDialog/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617612462980" />
-    <state x="93" y="93" width="1255" height="735" key="DiffContextDialog/0.0.1440.920@0.0.1440.920" timestamp="1617672237820" />
-    <state x="124" y="105" width="1674" height="831" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617621554862" />
-    <state x="604" y="247" key="EnvironmentVariablesDialog" timestamp="1617672016579">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="604" y="247" key="EnvironmentVariablesDialog/0.0.1440.920@0.0.1440.920" timestamp="1617672016579" />
-    <state x="434" y="372" key="FileChooserDialogImpl" timestamp="1617775405104">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="434" y="372" key="FileChooserDialogImpl/0.0.1440.920@0.0.1440.920" timestamp="1617775405104" />
-    <state x="579" y="420" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1617706557289" />
-    <state width="1419" height="261" key="GridCell.Tab.0.bottom" timestamp="1617937142611">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="261" key="GridCell.Tab.0.bottom/0.0.1440.920@0.0.1440.920" timestamp="1617937142611" />
-    <state width="1899" height="253" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617706505373" />
-    <state width="1419" height="261" key="GridCell.Tab.0.center" timestamp="1617937142611">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="261" key="GridCell.Tab.0.center/0.0.1440.920@0.0.1440.920" timestamp="1617937142611" />
-    <state width="1899" height="253" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617706505373" />
-    <state width="1419" height="261" key="GridCell.Tab.0.left" timestamp="1617937142611">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="261" key="GridCell.Tab.0.left/0.0.1440.920@0.0.1440.920" timestamp="1617937142611" />
-    <state width="1899" height="253" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617706505373" />
-    <state width="1419" height="261" key="GridCell.Tab.0.right" timestamp="1617937142611">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="261" key="GridCell.Tab.0.right/0.0.1440.920@0.0.1440.920" timestamp="1617937142611" />
-    <state width="1899" height="253" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617706505373" />
-    <state width="1419" height="174" key="GridCell.Tab.1.bottom" timestamp="1617864144313">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="174" key="GridCell.Tab.1.bottom/0.0.1440.920@0.0.1440.920" timestamp="1617864144313" />
-    <state width="1899" height="297" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
-    <state width="1419" height="174" key="GridCell.Tab.1.center" timestamp="1617864144313">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="174" key="GridCell.Tab.1.center/0.0.1440.920@0.0.1440.920" timestamp="1617864144313" />
-    <state width="1899" height="297" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
-    <state width="1419" height="174" key="GridCell.Tab.1.left" timestamp="1617864144313">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="174" key="GridCell.Tab.1.left/0.0.1440.920@0.0.1440.920" timestamp="1617864144313" />
-    <state width="1899" height="297" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
-    <state width="1419" height="174" key="GridCell.Tab.1.right" timestamp="1617864144313">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="1419" height="174" key="GridCell.Tab.1.right/0.0.1440.920@0.0.1440.920" timestamp="1617864144313" />
-    <state width="1899" height="297" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1617637878405" />
-    <state x="540" y="254" key="IDE.errors.dialog" timestamp="1617626729662">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="540" y="254" key="IDE.errors.dialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617626729662" />
-    <state x="2425" y="150" key="MergeDialog" timestamp="1617564733449">
-      <screen x="2160" y="0" width="1920" height="1040" />
-    </state>
-    <state x="2425" y="150" key="MergeDialog/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617564733449" />
-    <state x="357" y="221" key="MultipleFileMergeDialog" timestamp="1617458166478">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="357" y="221" key="MultipleFileMergeDialog/0.0.1440.920@0.0.1440.920" timestamp="1617458166478" />
-    <state x="331" y="108" key="SettingsEditor" timestamp="1617713514924">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="331" y="108" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1617713514924" />
-    <state x="313" y="194" key="Vcs.Push.Dialog.v2" timestamp="1617778255016">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="313" y="194" key="Vcs.Push.Dialog.v2/0.0.1440.920@0.0.1440.920" timestamp="1617778255016" />
-    <state width="726" height="468" key="XDebugger.FullValuePopup" timestamp="1617770121284">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state width="726" height="468" key="XDebugger.FullValuePopup/0.0.1440.920@0.0.1440.920" timestamp="1617770121284" />
-    <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1617637840258" />
-    <state x="93" y="93" width="1255" height="735" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1617672237820">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="93" y="93" width="1255" height="735" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1440.920@0.0.1440.920" timestamp="1617672237820" />
-    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog" timestamp="1617637877066">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.SelectionHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1617637877066" />
-    <state x="2923" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1617564690019">
-      <screen x="2160" y="0" width="1920" height="1040" />
-    </state>
-    <state x="2923" y="433" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1440.920/2160.0.1920.1040@2160.0.1920.1040" timestamp="1617564690019" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1617637938288">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1617637938288" />
-    <state x="443" y="372" key="vcs.readOnlyHandler.ReadOnlyStatusDialog" timestamp="1617936742258">
-      <screen x="0" y="0" width="1440" height="920" />
-    </state>
-    <state x="443" y="372" key="vcs.readOnlyHandler.ReadOnlyStatusDialog/0.0.1440.920@0.0.1440.920" timestamp="1617936742258" />
-  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -512,11 +394,6 @@
           <url>file://$PROJECT_DIR$/bindsnet/network/network.py</url>
           <line>320</line>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bindsnet/utils.py</url>
-          <line>246</line>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

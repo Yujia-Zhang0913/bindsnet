@@ -95,9 +95,6 @@ def plot_spikes(
         n_neurons = {}
 
     spikes = {k: v.view(v.size(0), -1) for (k, v) in spikes.items()}
-    print("lalalalalallal")
-    print("lalalalalallal")
-    print(spikes)
     if time is None:
         # Set it for entire duration
         for key in spikes.keys():

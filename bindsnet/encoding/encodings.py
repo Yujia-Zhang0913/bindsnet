@@ -385,6 +385,30 @@ def IO_Current2spikes(
 
     return Final_spike.byte()
 
+def Decode_Output(
+    datum: torch.Tensor,
+    neural_num: int,
+    time: int,
+    dt: float = 1.0,
+    bound: float = 10.0,
+    device="cpu",
+    approx=False,
+    **kwargs
+) -> torch.Tensor:
+
+    datum = torch.squeeze(datum, 1)
+    RATE = torch.zeros(neural_num)
+    Output = torch.zeros(neural_num)
+
+    times = torch.sum(datum, 0)
+    RATE = times / (time/dt)
+
+    for i in range(neural_num):
+        Output[i] = RATE[i] * (i*bound/neural_num)
+
+    Output = torch.sum(Output)
+    return Output
+
 
 
 

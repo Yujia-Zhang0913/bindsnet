@@ -1,7 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 
-from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes
+from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes,LIF_Train
 from bindsnet.network.topology import Connection
@@ -10,6 +10,7 @@ from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
+
 # TODO now can not run ,we need to learn how to write a pipeline
 time = 50
 network = Network(dt=0.1)
@@ -151,17 +152,17 @@ dt = 0.1
 # 输入信号编码测试
 neu_GR = 100
 a = torch.Tensor([0.5])
+
 data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)                    # Input_DATA, neural_num, time, dt
-print("data_Joint")
-print(data_Joint)
+
 # 监督信号编码测试
 neu_IO = 32
 supervise = torch.Tensor([0.1])
+
 ## 根据监督信号生成电流值 相同监督相同电流
 Curr, Curr_Anti = Error2IO_Current(supervise)
-print(Curr)
+
 IO_Input = IO_Current2spikes(Curr, neu_IO, encoding_time, dt)               # Supervise_DATA, neural_num, time, dt
-print(IO_Input)
 IO_Anti_Input = IO_Current2spikes(Curr_Anti, neu_IO, encoding_time, dt)
 
 
@@ -179,8 +180,8 @@ spikes = {
     "GR": GR_monitor.get("s"),
     "PK":PK_monitor.get("s"),
   #  "PK_Anti":PK_Anti_monitor.get("s"),
-    "IO":IO_monitor.get("s")
-  #  "DCN":DCN_monitor.get("s"),
+    "IO":IO_monitor.get("s"),
+    "DCN": DCN_monitor.get("s"),
    # "DCN_Anti":DCN_Anti_monitor.get("s")
 }
 spikes2 = {
@@ -197,10 +198,23 @@ plot_weights(weights=weight)
 voltages = {
     "DCN": DCN_monitor.get("v"),
     "PK":PK_monitor.get("v"),
-"PK_Anti":PK_Anti_monitor.get("v")
+    "PK_Anti":PK_Anti_monitor.get("v")
 }
 plt.ioff()
 plot_spikes(spikes)
+
+print("---- Output of DCN neural ----")
+
+DCN = DCN_monitor.get("s")
+Output = Decode_Output(DCN, 100, encoding_time, dt, 10.0)
+
+DCN_Anti = DCN_Anti_monitor.get("s")
+Output_Anti = Decode_Output(DCN, 100, encoding_time, dt, 10.0)
+
+print("The out put of the network is ")
+print(Output)
+print(Output_Anti)
+
 plot_voltages(voltages, plot_type="line")
 plt.show()
 
