@@ -75,7 +75,7 @@ def bernoulli(
     max_prob = kwargs.get("max_prob", 1.0)
     assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
     assert (datum >= 0).all(), "Inputs must be non-negative"
-
+    datum = np.copy(datum)  # TODO just copy,do not use directly
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
 
@@ -120,7 +120,7 @@ def poisson(
     :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Poisson-distributed spikes.
     """
     assert (datum >= 0).all(), "Inputs must be non-negative"
-
+    datum = np.copy(datum)
     # Get shape and size of data.
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
