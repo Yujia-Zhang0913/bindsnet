@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional,Union
 
 import torch
 import numpy as np
@@ -192,9 +192,9 @@ def rank_order(
     return spikes.reshape(time, *shape)
 
 def bernoulli_RBF(
-    datum: torch.Tensor,                # [n_1]
+    datum: Optional[Union[float, torch.Tensor]],                # [n_1]
     neural_num: int,                    # GR输入细胞的个数
-    time: Optional[int] = None,         # 编码的真实时间长度
+    time: Optional[float] = None,         # 编码的真实时间长度
     dt: float = 1.0,                    # 网络中仿真的长度
     device="cpu",                       # RESULT: shape [time/dt,neural_num]
     **kwargs
@@ -217,6 +217,8 @@ def bernoulli_RBF(
     """
     # Setting kwargs.
     # Setting kwargs.
+    if isinstance(datum, float):
+        datum = torch.Tensor([datum])
     max_prob = kwargs.get("max_prob", 1.0)
     assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
     assert (datum >= 0).all(), "Inputs must be non-negative"
@@ -254,8 +256,8 @@ def bernoulli_RBF(
     return spikes.byte()
 
 def poisson_IO(
-    datum: torch.Tensor,
-    time: int,
+    datum: Optional[Union[float, torch.Tensor]],
+    time: float,
     dt: float = 1.0,
     device="cpu",
     approx=False,
@@ -275,6 +277,8 @@ def poisson_IO(
     :param approx: Bool: use alternate faster, less accurate computation.
     :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Poisson-distributed spikes.
     """
+    if isinstance(datum, float):
+        datum = torch.Tensor([datum])
     assert (datum >= 0).all(), "Inputs must be non-negative"
 
     # Get shape and size of data.

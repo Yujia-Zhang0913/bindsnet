@@ -219,7 +219,7 @@ def reshape_conv2d_weights(weights: torch.Tensor) -> torch.Tensor:
 
 
 def Error2IO_Current(
-        datum: Tensor,
+        datum: Optional[Union[float, Tensor]],
         max_current: float = 0.8,
         base_current: float = 0.15,
         error_max: float = 10,
@@ -241,6 +241,8 @@ def Error2IO_Current(
     :return list={ current,current_anti}
 
     """
+    if isinstance(datum, float):
+        datum = torch.Tensor([datum])
     if datum.data > 0:
         # TODO 电流值数量级的把控--计算公式是否需要修改
         # 公式是想当然的 但是在数值上比较合理  --lys
