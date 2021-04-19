@@ -254,7 +254,7 @@ def Error2IO_Current(
     else:
         # TODO Anti的电流公式
         Current = base_current
-        Current = base_current + (max_current - base_current)/(1+math.exp(  10*datum.data+5))
+        Current_Anti = base_current + (max_current - base_current)/(1+math.exp(  10*datum.data+5))
 
         # 归一化 同时进行Tensor格式的转换
         Current = torch.Tensor([Current / max_current])

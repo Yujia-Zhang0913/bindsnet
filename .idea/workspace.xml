@@ -26,12 +26,23 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="nothing important just commit">
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="Done with the Decode_Output function">
+      <change afterPath="$PROJECT_DIR$/actutator.slxc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bindsnet/environment/environment_sim.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control.m" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actutator/checksumOfCache.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actutator/tmwinternal/simulink_cache.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/actutator/varInfo.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/checksumOfCache.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/tmwinternal/simulink_cache.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/slprj/sim/varcache/sscfluids_antagonistic_mckibben_actuator/varInfo.mat" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sscfluids_antagonistic_mckibben_actuator.slxc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/Cerebellum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/analysis/plotting.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/analysis/plotting.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/encoding/encodings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/actuator.slx" beforeDir="false" afterPath="$PROJECT_DIR$/actuator.slx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/environment/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/environment/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/environment/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/environment/environment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bindsnet/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +80,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
   </component>
-  <component name="RunManager" selected="Python.Cerebellum">
+  <component name="RunManager" selected="Python.main">
     <configuration name="Cerebellum" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Cloud" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -113,15 +124,15 @@
       <method v="2" />
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="CereSNN" />
+      <module name="Cloud" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\LYS\Desktop\Cloud\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
@@ -198,8 +209,8 @@
     </configuration>
     <list>
       <item itemvalue="Python.Cerebellum" />
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.breakout_stdp" />
+      <item itemvalue="Python.main" />
       <item itemvalue="Python.pytest" />
       <item itemvalue="Python.test_encoding" />
       <item itemvalue="Python.utils" />
@@ -334,7 +345,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617778204810</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Done with the Decode_Output function">
+      <created>1618116143834</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1618116143834</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -385,7 +403,8 @@
     <MESSAGE value="update" />
     <MESSAGE value="encoding 中确定了伯努利编码的具体形式" />
     <MESSAGE value="fix the IO_record&amp;STDP learning bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix the IO_record&amp;STDP learning bug" />
+    <MESSAGE value="Done with the Decode_Output function" />
+    <option name="LAST_COMMIT_MESSAGE" value="Done with the Decode_Output function" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

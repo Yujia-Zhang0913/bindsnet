@@ -1,20 +1,24 @@
-# This is a sample Python script.
+from abc import ABC, abstractmethod
+from typing import Tuple, Dict, Any,Optional,Callable
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import gym
+import numpy as np
+import torch
+from bindsnet.datasets.preprocess import subsample, gray_scale, binary_image, crop
+from bindsnet.encoding import Encoder, NullEncoder
+import bindsnet.environment as env
+import matplotlib.pyplot as plt
 
+from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
+from bindsnet.network import Network
+from bindsnet.network.nodes import Input, LIFNodes,LIF_Train
+from bindsnet.network.topology import Connection
+from bindsnet.network.monitors import Monitor
+from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
+from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
+from bindsnet.utils import Error2IO_Current
+from bindsnet.encoding import poisson, bernoulli
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
-# try to make a change
-# lallalaal
-# try this again
+My_env = env.WholeEnvironment_sim(50, 1, 2)
+My_env.step()
+My_env.step()
