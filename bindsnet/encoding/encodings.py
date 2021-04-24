@@ -194,7 +194,7 @@ def rank_order(
 def bernoulli_RBF(
     datum: Optional[Union[float, torch.Tensor]],                # [n_1]
     neural_num: int,                    # GR输入细胞的个数
-    time: Optional[float] = None,         # 编码的真实时间长度
+    time: Optional[int] = None,         # 编码的真实时间长度
     dt: float = 1.0,                    # 网络中仿真的长度
     device="cpu",                       # RESULT: shape [time/dt,neural_num]
     **kwargs
@@ -257,7 +257,7 @@ def bernoulli_RBF(
 
 def poisson_IO(
     datum: Optional[Union[float, torch.Tensor]],
-    time: float,
+    time: int,
     dt: float = 1.0,
     device="cpu",
     approx=False,
