@@ -7,12 +7,12 @@ from tqdm import tqdm
 import  numpy as np
 from .base_pipeline import BasePipeline
 from ..analysis.pipeline_analysis import MatplotlibAnalyzer
-from ..environment import Environment
+from ..environment import Environment,MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
-from ..network.monitors import Monitor
-
-
+from ..network.monitors import Monitor,Global_Monitor
+from bindsnet.encoding import bernoulli_RBF,poisson_IO,IO_Current2spikes,Decode_Output
+from bindsnet.utils import Error2IO_Current
 class TrajectoryPlanner:
     def __init__(self):
         self.plan_time = 10
@@ -20,19 +20,19 @@ class TrajectoryPlanner:
         self.p = np.zeros((int(self.plan_time/self.step_time)+1))
         self.v = np.zeros((int(self.plan_time/self.step_time)+1))
         self.a = np.zeros((int(self.plan_time/self.step_time)+1))
-    def Generate(self):
+    def generate(self):
         self.p
         self.v
         self.a
-    def Pos_Output(self,n_step)->float:
+    def pos_output(self,n_step)->float:
         """
         Output
         """
         return self.p[n_step]
-    def Vel_Output(self,n_step)->float:
+    def vel_output(self,n_step)->float:
         return self.v[n_step]
 
-    def Acc_Output(self,n_step)->float:
+    def acc_output(self,n_step)->float:
         return self.v[n_step]
 
 
@@ -360,11 +360,15 @@ class MusclePipeline(BasePipeline):
     def __init__(
         self,
         network: Network,
-        environment: Environment,
+        environment:MuscleEnvironment ,
         planner: TrajectoryPlanner,
-        output_decoding: Optional[Callable] = None,
-        error_encoding: Optional[Callable] = None,
-        input_encoding:Optional[Callable] = None,
+        global_monitor:Global_Monitor,
+        encoding_time:int,
+        total_time:float,
+        send_list:list,
+        receive_list:list,
+        kv:float,
+        kx:float,
         **kwargs,
     ):
         # language=rst
@@ -394,203 +398,88 @@ class MusclePipeline(BasePipeline):
 
         self.episode = 0
 
+        # save four mainly use obj
         self.env = environment
-        self.output_decoding = output_decoding
-        self.error_encoding = error_encoding
-        self.input_encoding = input_encoding
+        self.network = network
+        self.Info_network = {}
+        self.planner = planner
+        self.global_monitor = global_monitor
 
+        # para related with time scale
+        self.encoding_time = encoding_time
+        self.total_time = total_time
+        self.step_now = 0 # record which step the pipeline is in
 
+        self.send_list = send_list
+        self.receive_list = receive_list
 
+        self.kv = kv
+        self.kx = kx
+        # set GPU or CPU
         if torch.cuda.is_available() and self.allow_gpu:
             self.device = torch.device("cuda")
         else:
             self.device = torch.device("cpu")
 
-        # Set up for multiple layers of input layers.
-        self.inputs = [
-            name
-            for name, layer in network.layers.items()
-            if isinstance(layer, AbstractInput)
-        ]
+        # generate trajectory
+        self.planner.generate()
 
-        self.voltage_record = None
-        self.threshold_value = None
-        self.reward_plot = None
-        self.first = True
-
-        self.analyzer = MatplotlibAnalyzer(**self.plot_config)
-
-        if self.output is not None:
-            self.network.add_monitor(
-                Monitor(self.network.layers[self.output], ["s"], time=self.time),
-                self.output,
-            )
-
-            self.spike_record = {
-                self.output: torch.zeros((self.time, self.env.action_space.n)).to(
-                    self.device
-                )
-            }
-
-    def init_fn(self) -> None:
-        pass
-
-    def train(self, **kwargs) -> None:
-        # language=rst
-        """
-        Trains for the specified number of episodes. Each episode can be of arbitrary
-        length.
-        """
-        while self.episode < self.num_episodes:
-            self.reset_state_variables()
-
-            for _ in itertools.count():
-                obs, reward, done, info = self.env_step()
-
-                self.step((obs, reward, done, info), **kwargs)
-
-                if done:
-                    break
-
-            print(
-                f"Episode: {self.episode} - "
-                f"accumulated reward: {self.accumulated_reward:.2f}"
-            )
-            self.episode += 1
-
-    def env_step(self) -> Tuple[torch.Tensor, float, bool, Dict]:
+    def step(self) -> None:
         # language=rst
         """
         Single step of the environment which includes rendering, getting and performing
         the action, and accumulating/delaying rewards.
 
-        :return: An OpenAI ``gym`` compatible tuple with modified reward and info.
         """
-        # Render game.
-        if (
-            self.render_interval is not None
-            and self.step_count % self.render_interval == 0
-        ):
-            self.env.render()
+        # encode desired joint posistion
+        # TODO only pos no vel
+        desired_pos = bernoulli_RBF(self.planner.pos_output(self.step_now),
+                                    self.network.layers["GR_Joint_layer"].n,
+                                    self.encoding_time,
+                                    self.network.dt
+                                   )
+        self.Sender()
 
-        # Choose action based on output neuron spiking.
-        if self.action_function is not None:
-            self.last_action = self.action
-            if torch.rand(1) < self.percent_of_random_action:
-                self.action = torch.randint(
-                    low=0, high=self.env.action_space.n, size=(1,)
-                )[0]
-            elif self.action_counter > self.random_action_after:
-                if self.last_action == 0:  # last action was start b
-                    self.action = 1  # next action will be fire b
-                    tqdm.write(f"Fire -> too many times {self.last_action} ")
-                else:
-                    self.action = torch.randint(
-                        low=0, high=self.env.action_space.n, size=(1,)
-                    )[0]
-                    tqdm.write(f"too many times {self.last_action} ")
-            else:
-                self.action = self.action_function(self, output=self.output)
+        # get pos and vel from Info_network and
+        # [pos,vel] -> error -> current -> spike(input)
+        error = self.kx * (desired_pos - self.Info_network["vel"])
+        curr, curr_anti = Error2IO_Current(error)
+        IO_input = IO_Current2spikes(curr)
+        IO_anti_input = IO_Current2spikes(curr_anti)
+        inputs = {
+            "IO": IO_input,
+            "GR_Joint_layer": desired_pos,
+            "IO_Anti": IO_anti_input
+                }
+        # run the network and write into the Info_network
+        self.network_run(inputs)
+        # send from info_net to info_err
+        self.Receiver()
+        # eng step
+        self.env.step(record_list=["vel","pos"],command_list=["Output" , "Output_Anti"])
+        # monitor add
+        self.global_monitor.record(self.env.Info_muscle,self.Info_network)
+        # step sign ++
+        self.step_now += 1
 
-            if self.last_action == self.action:
-                self.action_counter += 1
-            else:
-                self.action_counter = 0
+    def Sender(self):
+        for l in self.send_list:
+            assert self.env.Info_muscle.get(l) is not None,"No such key in source list"
+            self.Info_network[l] = self.env.Info_muscle[l]
 
-        # Run a step of the environment.
-        obs, reward, done, info = self.env.step(self.action)
+    def Receiver(self):
+        for l in self.receive_list:
+            assert self.env.Info_muscle.get(l) is not None,"No such key in source list"
+            self.env.Info_muscle[l] = self.Info_network[l]
 
-        # Set reward in case of delay.
-        if self.reward_delay is not None:
-            self.rewards = torch.tensor([reward, *self.rewards[1:]]).float()
-            reward = self.rewards[-1]
-
-        # Accumulate reward.
-        self.accumulated_reward += reward
-
-        info["accumulated_reward"] = self.accumulated_reward
-
-        return obs, reward, done, info
-
-    def step_(
-        self, gym_batch: Tuple[torch.Tensor, float, bool, Dict], **kwargs
-    ) -> None:
-        # language=rst
-        """
-        Run a single iteration of the network and update it and the reward list when
-        done.
-
-        :param gym_batch: An OpenAI ``gym`` compatible tuple.
-        """
-        obs, reward, done, info = gym_batch
-
-        if self.overlay_t > 1:
-            if self.overlay_start:
-                self.overlay_last_obs = (
-                    obs.view(obs.shape[2], obs.shape[3]).clone().to(self.device)
-                )
-                self.overlay_buffer = torch.stack(
-                    [self.overlay_last_obs] * self.overlay_t, dim=2
-                ).to(self.device)
-                self.overlay_start = False
-            else:
-                obs = obs.to(self.device)
-                self.overlay_next_stat = torch.clamp(
-                    self.overlay_last_obs - obs, min=0
-                ).to(self.device)
-                self.overlay_last_obs = obs.clone()
-                self.overlay_buffer = torch.cat(
-                    (
-                        self.overlay_buffer[:, :, 1:],
-                        self.overlay_next_stat.view(
-                            [
-                                self.overlay_next_stat.shape[2],
-                                self.overlay_next_stat.shape[3],
-                                1,
-                            ]
-                        ),
-                    ),
-                    dim=2,
-                )
-            obs = (
-                torch.sum(self.overlay_time_effect * self.overlay_buffer, dim=2)
-                * self.encode_factor
-            )
-
-        # Place the observations into the inputs.
-        if self.encoding is None:
-            obs = obs.unsqueeze(0).unsqueeze(0)
-            obs_shape = torch.tensor([1] * len(obs.shape[1:]), device=self.device)
-            inputs = {
-                k: self.encoding(
-                    obs.repeat(self.time, *obs_shape).to(self.device),
-                    device=self.device,
-                )
-                for k in self.inputs
-            }
-        else:
-            obs = obs.unsqueeze(0)
-            inputs = {
-                k: self.encoding(obs, self.time, device=self.device)
-                for k in self.inputs
-            }
-
-        # Run the network on the spike train-encoded inputs.
-        self.network.run(inputs=inputs, time=self.time, reward=reward, **kwargs)
-
-        if self.output is not None:
-            self.spike_record[self.output] = (
-                self.network.monitors[self.output].get("s").float()
-            )
-
-        if done:
-            if self.network.reward_fn is not None:
-                self.network.reward_fn.update(
-                    accumulated_reward=self.accumulated_reward,
-                    steps=self.step_count,
-                    **kwargs,
-                )
-            self.reward_list.append(self.accumulated_reward)
+    def network_run(self,inputs:Dict):
+        self.network.run(inputs = inputs,time = self.encoding_time)
+        DCN = self.network.monitors["DCN"].get("s")
+        Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.dt, 10.0)
+        DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
+        Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.dt, 10.0)
+        self.Info_network["Output"] = Output
+        self.Info_network["Output_Anti"] = Output_Anti
 
     def reset_state_variables(self) -> None:
         # language=rst
@@ -599,35 +488,5 @@ class MusclePipeline(BasePipeline):
         """
         self.env.reset()
         self.network.reset_state_variables()
-        self.accumulated_reward = 0.0
-        self.step_count = 0
-        self.overlay_start = True
-        self.action = torch.tensor(-1)
-        self.last_action = torch.tensor(-1)
-        self.action_counter = 0
+        self.step_now = 0
 
-    def plots(self, gym_batch: Tuple[torch.Tensor, float, bool, Dict], *args) -> None:
-        # language=rst
-        """
-        Plot the encoded input, layer spikes, and layer voltages.
-
-        :param gym_batch: An OpenAI ``gym`` compatible tuple.
-        """
-        if self.plot_interval is None:
-            return
-
-        obs, reward, done, info = gym_batch
-
-        for key, item in self.plot_config.items():
-            if key == "obs_step" and item is not None:
-                if self.step_count % item == 0:
-                    self.analyzer.plot_obs(obs[0, ...].sum(0))
-            elif key == "data_step" and item is not None:
-                if self.step_count % item == 0:
-                    self.analyzer.plot_spikes(self.get_spike_data())
-                    self.analyzer.plot_voltages(*self.get_voltage_data())
-            elif key == "reward_eps" and item is not None:
-                if self.episode % item == 0 and done:
-                    self.analyzer.plot_reward(self.reward_list)
-
-        self.analyzer.finalize_step()

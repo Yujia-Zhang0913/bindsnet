@@ -1,1 +1,1 @@
-from .environment import Environment, GymEnvironment, NetworkEnvironment_sim,WholeEnvironment_sim
+from .environment import Environment, GymEnvironment, NetworkEnvironment_sim,WholeEnvironment_sim,MuscleEnvironment

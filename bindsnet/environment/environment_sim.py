@@ -278,7 +278,6 @@ class MuscleEnvironment(Environment):
         matlab.engine.start_matlab()  # start the topic from matlab
         self.eng = matlab.engine.connect_matlab()  # connect the topic
         assert (self.eng is not None), "Failed to connect with  matlab"  # if not, exit
-        self.n_mat_step = n_mat_step;
         self.MATLABSTEPTIME = MATLABSTEPTIME;
         self.Info_muscle = {"Muscle": 0,  "Command":0, "Command_Anti":0}
         self.sim_name = None
@@ -341,7 +340,6 @@ class MuscleEnvironment(Environment):
             for c in command_list:
                 assert(isinstance(c,str),"Invaild command key! Key must be string type")
                 assert(self.Info_muscle.get(c) is not None,"No such key in Info_muscle")
-                self.eng.workspace[c] = self.Info_muscle[c]
                 self.eng.workspace[c] = self.Info_muscle[c]
 
     def reset(self) -> None:

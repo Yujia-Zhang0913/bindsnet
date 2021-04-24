@@ -478,7 +478,7 @@ class WholeEnvironment_sim(Environment):
     """
 
     def __init__(self,
-                 encoding_time:int,
+                 encoding_time:float,
                  goal:float,
                  steps:int,
                  **kwargs) -> None:
@@ -491,8 +491,8 @@ class WholeEnvironment_sim(Environment):
         self.steps = steps
 
         self.Traj_planner()
-        self.Traj_Info = torch.Tensor([0.1, 0.1, 0.1, 0.1])
-        self.Supervisor_Info = torch.Tensor([0.1, 0.1, 0.1, 0.1])
+        self.Traj_Info = torch.Tensor([0.1, 0.1, 0.1, 0.1]) #TODO
+        self.Supervisor_Info = torch.Tensor([0.1, 0.1, 0.1, 0.1])##TODO
 
         self.Network_env = NetworkEnvironment_sim(encoding_time, 0, 0)
         self.Network_env.Network_str()
@@ -629,7 +629,7 @@ class MuscleEnvironment(Environment):
             print("You want to record empty!")
         else:
             for l in para_list:
-                assert(isinstance(l,str),"Invaild record key! Key must be string type")
+                assert isinstance(l,str),"Invaild record key! Key must be string type"
                 self.Info_muscle[l] = self.eng.workspace[l]
 
     def Send_control(self,command_list:list):
@@ -643,8 +643,8 @@ class MuscleEnvironment(Environment):
             print("You want to record empty!")
         else:
             for c in command_list:
-                assert(isinstance(c,str),"Invaild command key! Key must be string type")
-                assert(self.Info_muscle.get(c) is not None,"No such key in Info_muscle")
+                assert isinstance(c,str),"Invaild command key! Key must be string type"
+                assert self.Info_muscle.get(c) is not None,"No such key in Info_muscle"
                 self.eng.workspace[c] = self.Info_muscle[c]
                 self.eng.workspace[c] = self.Info_muscle[c]
 
@@ -653,7 +653,7 @@ class MuscleEnvironment(Environment):
         """
         reset eng and clear the Info dictionary
         """
-        self.eng.reset() #TODO matlab reload model
+        self.eng(self.sim_name, "SimulationCommand", "restart", nargout=0)
         self.Info_muscle = {}
 
     def close(self) -> None:
@@ -661,7 +661,7 @@ class MuscleEnvironment(Environment):
         """
         Wrapper around the OpenAI ``gym`` environment ``close()`` function.
         """
-        assert(self.sim_name is not None,"No simulink is running!")
+        assert self.sim_name is not None,"No simulink is running!"
         self.eng(self.sim_name, "SimulationCommand", "stop", nargout=0)
 
     def render(self) -> None:
