@@ -354,7 +354,7 @@ class Global_Monitor(AbstractMonitor):
         Appends the current value of the recorded state variables to the recording.
         """
         for v in self.muscle_vars:
-            data = info_muscle[v]
+            data = torch.Tensor([info_muscle[v]])
             # self.recording[v].append(data.detach().clone().to(self.device))
             self.recording[v].append(
                 torch.empty_like(data, device=self.device, requires_grad=False).copy_(
@@ -366,7 +366,7 @@ class Global_Monitor(AbstractMonitor):
                 self.recording[v].pop(0)
 
         for v in self.net_vars:
-            data = info_net[v]
+            data = torch.Tensor([info_net[v]])
             # self.recording[v].append(data.detach().clone().to(self.device))
             self.recording[v].append(
                 torch.empty_like(data, device=self.device, requires_grad=False).copy_(

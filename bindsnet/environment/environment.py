@@ -586,7 +586,7 @@ class MuscleEnvironment:
         self.env_step_count = 0
         self.step_min = step_min
 
-    def start(self,sim_name:str='actuator.slx'):
+    def start(self,sim_name:str='actuator'):
         # language=rst
         """
             start the Simulink
@@ -609,15 +609,25 @@ class MuscleEnvironment:
         # Send command to eng
         self.Send_control(command_list)
         # Call eng environment to run for n_mat_step
-        t_now = self.eng.workspace['tout'][self.env_step_count]
-        while self.eng.workspace['tout'][self.env_step_count+1]-t_now<self.step_min:
+        if self.env_step_count is 0:
             self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
             self.env_step_count += 1
+        t_now = self.eng.workspace['tout'][self.env_step_count]
+        t_now = self.eng.single(t_now)
+        t_next = self.eng.workspace['tout'][self.env_step_count+1]
+        t_next = self.eng.single(t_next)
+        while t_next-t_now<self.step_min:
+            self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
+            self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
+            self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
+            self.env_step_count += 1
+            t_next = self.eng.workspace['tout'][self.env_step_count]
+            t_next = self.eng.single(t_next)
         # load data from eng to Info
 
-        self.Rec_eng_Info([record_list])
+        self.Rec_eng_Info(record_list)
 
     def Rec_eng_Info(self,para_list:list)->None:
         # TODO due to the data structure of matlab workspace
@@ -633,7 +643,7 @@ class MuscleEnvironment:
         else:
             for l in para_list:
                 assert isinstance(l,str),"Invaild record key! Key must be string type"
-                self.Info_muscle[l] = self.eng.workspace[l]
+                self.Info_muscle[l] = self.eng.single(self.eng.workspace[l])
 
     def Send_control(self,command_list:list):
         # TODO due to the data structure of matlab workspace
@@ -649,7 +659,6 @@ class MuscleEnvironment:
             for c in command_list:
                 assert isinstance(c,str),"Invaild command key! Key must be string type"
                 assert self.Info_muscle.get(c) is not None,"No such key in Info_muscle"
-                self.eng.workspace[c] = self.Info_muscle[c]
                 self.eng.workspace[c] = self.Info_muscle[c]
 
     def reset(self) -> None:
