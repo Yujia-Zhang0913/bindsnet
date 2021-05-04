@@ -4,40 +4,45 @@ from typing import Callable, Optional, Tuple, Dict
 import torch
 
 from tqdm import tqdm
-import  numpy as np
+import numpy as np
 from .base_pipeline import BasePipeline
 from ..analysis.pipeline_analysis import MatplotlibAnalyzer
-from ..environment import Environment,MuscleEnvironment
+from ..environment import Environment, MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
-from ..network.monitors import Monitor,Global_Monitor
-from bindsnet.encoding import bernoulli_RBF,poisson_IO,IO_Current2spikes,Decode_Output
+from ..network.monitors import Monitor, Global_Monitor
+from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.utils import Error2IO_Current
+
+
 class TrajectoryPlanner:
     def __init__(self):
         self.plan_time = 10
         self.step_time = 0.1
-        self.p = np.zeros((int(self.plan_time/self.step_time)+1))
-        self.v = np.zeros((int(self.plan_time/self.step_time)+1))
-        self.a = np.zeros((int(self.plan_time/self.step_time)+1))
+        self.p = np.zeros((int(self.plan_time / self.step_time) + 1))
+        self.v = np.zeros((int(self.plan_time / self.step_time) + 1))
+        self.a = np.zeros((int(self.plan_time / self.step_time) + 1))
+
     def generate(self):
-        self.p
-        self.v
-        self.a
-    def pos_output(self,n_step)->float:
+        min_theta = 0
+        max_theta = 1
+        for i in range(0, int(self.plan_time / self.step_time + 1)):
+            if i < int(self.plan_time / self.step_time/2):
+                self.p[i] = min_theta
+            else:
+                self.p[i] = max_theta
+
+    def pos_output(self, n_step) -> float:
         """
         Output
         """
         return self.p[n_step]
-    def vel_output(self,n_step)->float:
+
+    def vel_output(self, n_step) -> float:
         return self.v[n_step]
 
-    def acc_output(self,n_step)->float:
+    def acc_output(self, n_step) -> float:
         return self.v[n_step]
-
-
-
-
 
 
 class EnvironmentPipeline(BasePipeline):
@@ -48,12 +53,12 @@ class EnvironmentPipeline(BasePipeline):
     """
 
     def __init__(
-        self,
-        network: Network,
-        environment: Environment,
-        action_function: Optional[Callable] = None,
-        encoding: Optional[Callable] = None,
-        **kwargs,
+            self,
+            network: Network,
+            environment: Environment,
+            action_function: Optional[Callable] = None,
+            encoding: Optional[Callable] = None,
+            **kwargs,
     ):
         # language=rst
         """
@@ -185,8 +190,8 @@ class EnvironmentPipeline(BasePipeline):
         """
         # Render game.
         if (
-            self.render_interval is not None
-            and self.step_count % self.render_interval == 0
+                self.render_interval is not None
+                and self.step_count % self.render_interval == 0
         ):
             self.env.render()
 
@@ -230,7 +235,7 @@ class EnvironmentPipeline(BasePipeline):
         return obs, reward, done, info
 
     def step_(
-        self, gym_batch: Tuple[torch.Tensor, float, bool, Dict], **kwargs
+            self, gym_batch: Tuple[torch.Tensor, float, bool, Dict], **kwargs
     ) -> None:
         # language=rst
         """
@@ -270,8 +275,8 @@ class EnvironmentPipeline(BasePipeline):
                     dim=2,
                 )
             obs = (
-                torch.sum(self.overlay_time_effect * self.overlay_buffer, dim=2)
-                * self.encode_factor
+                    torch.sum(self.overlay_time_effect * self.overlay_buffer, dim=2)
+                    * self.encode_factor
             )
 
         # Place the observations into the inputs.
@@ -350,7 +355,7 @@ class EnvironmentPipeline(BasePipeline):
         self.analyzer.finalize_step()
 
 
-class MusclePipeline(BasePipeline):
+class MusclePipeline:
     # language=rst
     """
     Abstracts the interaction between ``Network``, ``Environment``, and environment
@@ -358,18 +363,17 @@ class MusclePipeline(BasePipeline):
     """
 
     def __init__(
-        self,
-        network: Network,
-        environment:MuscleEnvironment ,
-        planner: TrajectoryPlanner,
-        global_monitor:Global_Monitor,
-        encoding_time:int,
-        total_time:float,
-        send_list:list,
-        receive_list:list,
-        kv:float,
-        kx:float,
-        **kwargs,
+            self,
+            network: Network,
+            environment: MuscleEnvironment,
+            planner: TrajectoryPlanner,
+            encoding_time: int,
+            total_time: float,
+            send_list: list,
+            receive_list: list,
+            kv: float,
+            kx: float,
+            **kwargs,
     ):
         # language=rst
         """
@@ -394,36 +398,39 @@ class MusclePipeline(BasePipeline):
 
             timestep.
         """
-        super().__init__(network, **kwargs)
 
         self.episode = 0
 
         # save four mainly use obj
         self.env = environment
         self.network = network
-        self.Info_network = {}
+        self.Info_network = {"pos": 0, "vel": 0}
         self.planner = planner
-        self.global_monitor = global_monitor
+        self.global_monitor = Global_Monitor(muscle_vars=self.env.Info_muscle,
+                                             net_vars=self.Info_network,
+                                             )
 
         # para related with time scale
         self.encoding_time = encoding_time
         self.total_time = total_time
-        self.step_now = 0 # record which step the pipeline is in
+        self.step_now = 0  # record which step the pipeline is in
 
         self.send_list = send_list
         self.receive_list = receive_list
 
         self.kv = kv
         self.kx = kx
+
+        self.is_done = False
         # set GPU or CPU
-        if torch.cuda.is_available() and self.allow_gpu:
-            self.device = torch.device("cuda")
-        else:
-            self.device = torch.device("cpu")
+        # if torch.cuda.is_available() and self.allow_gpu:
+        #     self.device = torch.device("cuda")
+        # else:
+        #     self.device = torch.device("cpu")
 
         # generate trajectory
         self.planner.generate()
-
+        self.env.start(sim_name="actuator.slx")
     def step(self) -> None:
         # language=rst
         """
@@ -437,12 +444,19 @@ class MusclePipeline(BasePipeline):
                                     self.network.layers["GR_Joint_layer"].n,
                                     self.encoding_time,
                                     self.network.dt
-                                   )
+                                    )
+        desired_vel = bernoulli_RBF(self.planner.vel_output(self.step_now),
+                                    self.network.layers["GR_Joint_layer"].n,
+                                    self.encoding_time,
+                                    self.network.dt
+                                    )
         self.Sender()
 
         # get pos and vel from Info_network and
         # [pos,vel] -> error -> current -> spike(input)
-        error = self.kx * (desired_pos - self.Info_network["vel"])
+        # error = self.kx * (desired_pos - self.Info_network["pos"]) + self.kv * (desired_vel - self.Info_network["vel"])
+        error = self.kx * (desired_pos - self.Info_network["pos"])
+
         curr, curr_anti = Error2IO_Current(error)
         IO_input = IO_Current2spikes(curr)
         IO_anti_input = IO_Current2spikes(curr_anti)
@@ -450,42 +464,49 @@ class MusclePipeline(BasePipeline):
             "IO": IO_input,
             "GR_Joint_layer": desired_pos,
             "IO_Anti": IO_anti_input
-                }
+        }
         # run the network and write into the Info_network
         self.network_run(inputs)
         # send from info_net to info_err
         self.Receiver()
         # eng step
-        self.env.step(record_list=["vel","pos"],command_list=["Output" , "Output_Anti"])
+        self.env.step(record_list=self.receive_list, command_list=self.send_list)
         # monitor add
-        self.global_monitor.record(self.env.Info_muscle,self.Info_network)
+        self.global_monitor.record(self.env.Info_muscle, self.Info_network)
         # step sign ++
         self.step_now += 1
+        if self.step_now>=(self.total_time/self.encoding_time):
+            self.is_done = True
+        print(self.step_now)
+        print(error)
+        print("----")
 
     def Sender(self):
         for l in self.send_list:
-            assert self.env.Info_muscle.get(l) is not None,"No such key in source list"
+            assert self.env.Info_muscle.get(l) is not None, "No such key in source list"
             self.Info_network[l] = self.env.Info_muscle[l]
 
     def Receiver(self):
         for l in self.receive_list:
-            assert self.env.Info_muscle.get(l) is not None,"No such key in source list"
+            assert self.env.Info_muscle.get(l) is not None, "No such key in source list"
             self.env.Info_muscle[l] = self.Info_network[l]
 
-    def network_run(self,inputs:Dict):
-        self.network.run(inputs = inputs,time = self.encoding_time)
+    def network_run(self, inputs: Dict):
+        self.network.run(inputs=inputs, time=self.encoding_time)
         DCN = self.network.monitors["DCN"].get("s")
         Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.dt, 10.0)
         DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
         Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.dt, 10.0)
-        self.Info_network["Output"] = Output
-        self.Info_network["Output_Anti"] = Output_Anti
+        self.Info_network["network"] = int(Output)
+        self.Info_network["anti_network"] = int(Output_Anti)
 
     def reset_state_variables(self) -> None:
         # language=rst
         """
         Reset the pipeline.
         """
+        if self.step_now is not 0:
+            self.env.close()
         self.env.reset()
         self.network.reset_state_variables()
         self.step_now = 0

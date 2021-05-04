@@ -18,7 +18,7 @@ from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
-
+import matlab.engine
 
 class Environment(ABC):
     # language=rst
@@ -562,15 +562,14 @@ class WholeEnvironment_sim(Environment):
         pass
 
 
-class MuscleEnvironment(Environment):
+class MuscleEnvironment:
     # language=rst
     """
     A wrapper around the OpenAI ``gym`` environments.
     """
 
     def __init__(self,
-                 encoding_time: int,
-                 MATLABSTEPTIME:float,
+                 step_min:float=0.1,
                  **kwargs) -> None:
         # language=rst
         """
@@ -578,14 +577,14 @@ class MuscleEnvironment(Environment):
            :param MATLABSTEPTIME: eng time per step
 
         """
-        self.n_mat_step = (encoding_time / MATLABSTEPTIME)
         matlab.engine.start_matlab()  # start the topic from matlab
         self.eng = matlab.engine.connect_matlab()  # connect the topic
         assert (self.eng is not None), "Failed to connect with  matlab"  # if not, exit
-        self.n_mat_step = n_mat_step;
-        self.MATLABSTEPTIME = MATLABSTEPTIME;
-        self.Info_muscle = {"Muscle": 0,  "Command":0, "Command_Anti":0}
+        print("Successfully connected!")
+        self.Info_muscle = {"pos":0,"vel":0}
         self.sim_name = None
+        self.env_step_count = 0
+        self.step_min = step_min
 
     def start(self,sim_name:str='actuator.slx'):
         # language=rst
@@ -610,11 +609,14 @@ class MuscleEnvironment(Environment):
         # Send command to eng
         self.Send_control(command_list)
         # Call eng environment to run for n_mat_step
-        for i in range(self.n_mat_step):
+        t_now = self.eng.workspace['tout'][self.env_step_count]
+        while self.eng.workspace['tout'][self.env_step_count+1]-t_now<self.step_min:
             self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
-            self.eng(self.sim_name, "SimulationCommand", "step", nargout=0)
-            self.eng(self.sim_name, "SimulationCommand", "pause", nargout=0)
+            self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
+            self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
+            self.env_step_count += 1
         # load data from eng to Info
+
         self.Rec_eng_Info([record_list])
 
     def Rec_eng_Info(self,para_list:list)->None:
@@ -625,6 +627,7 @@ class MuscleEnvironment(Environment):
             load desired eng variable from workspace to "Info_muscle"
            :param para_list: name list of the eng variable you want to record
         """
+
         if len(para_list) is 0:
             print("You want to record empty!")
         else:
@@ -639,6 +642,7 @@ class MuscleEnvironment(Environment):
             load desired eng variable from workspace to "Info_muscle"
            :param command_list: name list of the variable you want to send from Info_muscle to eng
         """
+
         if len(command_list) is 0:
             print("You want to record empty!")
         else:
@@ -653,17 +657,17 @@ class MuscleEnvironment(Environment):
         """
         reset eng and clear the Info dictionary
         """
-        self.eng(self.sim_name, "SimulationCommand", "restart", nargout=0)
-        self.Info_muscle = {}
-
+        self.eng.run("Para_in.m",nargout=0)  # load the data again
+        self.Info_muscle = {"pos":0,"vel":0}
+        self.env_step_count = 0
     def close(self) -> None:
         # language=rst
         """
         Wrapper around the OpenAI ``gym`` environment ``close()`` function.
         """
         assert self.sim_name is not None,"No simulink is running!"
-        self.eng(self.sim_name, "SimulationCommand", "stop", nargout=0)
-
+        self.eng.set_param(self.sim_name, "SimulationCommand", "stop", nargout=0)
+        self.eng.clear(nargout=0)
     def render(self) -> None:
         # language=rst
         """
