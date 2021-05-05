@@ -643,7 +643,7 @@ class MuscleEnvironment:
         else:
             for l in para_list:
                 assert isinstance(l,str),"Invaild record key! Key must be string type"
-                self.Info_muscle[l] = self.eng.single(self.eng.workspace[l])
+                self.Info_muscle[l] = self.eng.single(self.eng.workspace[l][self.env_step_count][1])
 
     def Send_control(self,command_list:list):
         # TODO due to the data structure of matlab workspace

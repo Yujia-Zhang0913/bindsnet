@@ -13,7 +13,7 @@ from ..network.nodes import AbstractInput
 from ..network.monitors import Monitor, Global_Monitor
 from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.utils import Error2IO_Current
-
+from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 
 class TrajectoryPlanner:
     def __init__(self):
@@ -477,7 +477,7 @@ class MusclePipeline:
         # send from info_net to info_err
         self.Receiver()
         # eng step
-        self.env.step(record_list=self.receive_list, command_list=self.send_list)
+        self.env.step(record_list=['pos','vel'], command_list=['network','anti_network'])
         # monitor add
         self.global_monitor.record(self.env.Info_muscle, self.Info_network)
         # step sign ++
@@ -485,8 +485,10 @@ class MusclePipeline:
         if self.step_now >= (self.total_time/self.encoding_time):
             self.is_done = True
         print(self.step_now)
+        print("error: ",end='')
         print(error)
-        print("----")
+        print("Network command:{}".format(self.Info_network['network']))
+        print("Anti_Network command:{}".format(self.Info_network['anti_network']))
 
     def Sender(self):
         for l in self.send_list:
@@ -500,10 +502,16 @@ class MusclePipeline:
 
     def network_run(self, inputs: Dict):
         self.network.run(inputs=inputs, time=self.encoding_time)
-        DCN = self.network.monitors["DCN"].get("s")
-        Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, 10.0)
-        DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
-        Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.network.dt, 10.0)
+        # DCN = self.network.monitors["DCN"].get("s")
+        # plot_spikes({"DCN":DCN})
+        # Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, 10.0)
+        # DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
+        # Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.network.dt, 10.0)
+        PK = self.network.monitors["PK"].get("s")
+        # plot_spikes({"PK":PK})
+        Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 10.0)
+        PK_Anti = self.network.monitors["PK_Anti"].get("s")
+        Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt, 10.0)
         self.Info_network["network"] = int(Output)
         self.Info_network["anti_network"] = int(Output_Anti)
 

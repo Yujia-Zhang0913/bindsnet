@@ -250,8 +250,6 @@ def bernoulli_RBF(
     spikes = spikes.view(*shape)
 
     print("----The encoding of Input variable during (time / dt)----")
-    print(spikes)
-    print(spikes.size())
 
     return spikes.byte()
 
@@ -384,8 +382,6 @@ def IO_Current2spikes(
     Final_spike = Final_spike.resize(Time_network, neural_num)
 
     print("----The encoding of Input supervisor during (time / dt)----")
-    print(Final_spike)
-    print(Final_spike.size())
 
     return Final_spike.byte()
 
