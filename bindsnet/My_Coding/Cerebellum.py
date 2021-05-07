@@ -11,7 +11,6 @@ from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
 
-# TODO now can not run ,we need to learn how to write a pipeline
 time = 50
 network = Network(dt=0.1)
 # GR_Movement_layer = Input(n=100)
@@ -157,7 +156,7 @@ data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)                    # In
 
 # 监督信号编码测试
 neu_IO = 32
-supervise = torch.Tensor([0.1])
+supervise = torch.Tensor([0])
 
 ## 根据监督信号生成电流值 相同监督相同电流
 Curr, Curr_Anti = Error2IO_Current(supervise)

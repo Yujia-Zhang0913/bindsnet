@@ -388,7 +388,6 @@ class IO_Record(LearningRule):
         Post-pre learning rule for ``Connection`` subclass of ``AbstractConnection``
         class.
         """
-        # TODO 记住Tensor直接复制 指向了相同的内从空间
         self.target.IO_s = self.source.s.clone()  # 记录 是否有脉冲，一定要有clone
 
         super().update()

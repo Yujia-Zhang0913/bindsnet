@@ -75,7 +75,7 @@ def bernoulli(
     max_prob = kwargs.get("max_prob", 1.0)
     assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
     assert (datum >= 0).all(), "Inputs must be non-negative"
-    datum = np.copy(datum)  # TODO just copy,do not use directly
+    datum = np.copy(datum)
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
 
@@ -295,7 +295,6 @@ def poisson_IO(
         # Compute firing rates in seconds as function of data intensity,
         # accounting for simulation time step.
         rate = torch.zeros(size, device=device)
-        # TODO 可以再确定下firing RATE计算的依据，这里暂且做归一化处理使得RATE<1
         # rate[datum != 0] = 1 / datum[datum != 0] * (1000 / dt)
         rate = datum / torch.max(datum)
 
@@ -317,7 +316,6 @@ def poisson_IO(
         spikes[times, torch.arange(ner)] = 1
         spikes = spikes[1:]
 
-        # TODO enable spikes  times*num of ner
         return spikes.view(time, ner)
 
 def IO_Current2spikes(
@@ -364,7 +362,6 @@ def IO_Current2spikes(
     Final_spike = []
     Final_spike = torch.tensor(Final_spike)
 
-    # TODO append不能加入重复元素导致维度不一样
     for t in range(Time_network):
         spike = np.zeros(neural_num)
 
@@ -384,6 +381,7 @@ def IO_Current2spikes(
     print("----The encoding of Input supervisor during (time / dt)----")
 
     return Final_spike.byte()
+
 
 def Decode_Output(
     datum: torch.Tensor,
@@ -407,6 +405,7 @@ def Decode_Output(
         Output[i] = RATE[i] * (i*bound/neural_num)
 
     Output = torch.sum(Output)
+    Output = torch.sigmoid(Output)
     return Output
 
 

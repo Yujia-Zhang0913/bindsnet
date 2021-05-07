@@ -1,6 +1,6 @@
 import itertools
 from typing import Callable, Optional, Tuple, Dict
-
+from math import sin,pi
 import torch
 
 from tqdm import tqdm
@@ -24,13 +24,15 @@ class TrajectoryPlanner:
         self.a = np.zeros((int(self.plan_time / self.step_time) + 1))
 
     def generate(self):
-        min_theta = 0
-        max_theta = 1
+        # min_theta = 0
+        # max_theta = 1
+        # for i in range(0, int(self.plan_time / self.step_time + 1)):
+        #     if i < int(self.plan_time / self.step_time/2):
+        #         self.p[i] = min_theta
+        #     else:
+        #         self.p[i] = max_theta
         for i in range(0, int(self.plan_time / self.step_time + 1)):
-            if i < int(self.plan_time / self.step_time/2):
-                self.p[i] = min_theta
-            else:
-                self.p[i] = max_theta
+            self.p[i] = 10*sin(0.1*0.1*i-pi/2)+10
 
     def pos_output(self, n_step) -> float:
         """
@@ -404,7 +406,7 @@ class MusclePipeline:
         # save four mainly use obj
         self.env = environment
         self.network = network
-        self.Info_network = {"pos": 0, "vel": 0}
+        self.Info_network = {"pos": 0.0, "vel": 0.0,"network":0.0,"anti_network":0.0}
         self.planner = planner
         self.global_monitor = Global_Monitor(muscle_vars=["pos","vel"],
                                              net_vars=["network","anti_network"],
@@ -485,8 +487,11 @@ class MusclePipeline:
         if self.step_now >= (self.total_time/self.encoding_time):
             self.is_done = True
         print(self.step_now)
+        print(self.env.eng.workspace["tout"][self.env.env_step_count])
         print("error: ",end='')
         print(error)
+        print(self.planner.pos_output(self.step_now))
+        print(self.Info_network["pos"])
         print("Network command:{}".format(self.Info_network['network']))
         print("Anti_Network command:{}".format(self.Info_network['anti_network']))
 
@@ -512,8 +517,8 @@ class MusclePipeline:
         Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 10.0)
         PK_Anti = self.network.monitors["PK_Anti"].get("s")
         Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt, 10.0)
-        self.Info_network["network"] = int(Output)
-        self.Info_network["anti_network"] = int(Output_Anti)
+        self.Info_network["network"] = float(Output)
+        self.Info_network["anti_network"] = float(Output_Anti)
 
     def reset_state_variables(self) -> None:
         # language=rst

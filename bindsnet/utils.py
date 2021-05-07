@@ -249,7 +249,7 @@ def Error2IO_Current(
         Current = base_current + (max_current - base_current)/(1+math.exp( - 10*datum.data+5))
         Current_Anti = base_current
 
-        #归一化 同时进行Tensor格式的转换
+        # 归一化 同时进行Tensor格式的转换
         Current = torch.Tensor([Current / max_current])
         Current_Anti = torch.Tensor([Current_Anti / max_current])
 
@@ -264,9 +264,9 @@ def Error2IO_Current(
 
     # TODO 简化了静息状态的操作
     print("----The result of error to current----")
-    print("Current : ")
+    print("Current : ",end='')
     print(Current)
-    print("Current_Anti : ")
+    print("Current_Anti : ",end='')
     print(Current_Anti)
 
     return Current, Current_Anti
