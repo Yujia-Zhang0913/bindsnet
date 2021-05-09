@@ -5,7 +5,7 @@ from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2sp
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes, LIF_Train
 from bindsnet.network.topology import Connection
-from bindsnet.network.monitors import Monitor, Global_Monitor
+from bindsnet.network.monitors import Monitor, Global_Monitor,Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
 from bindsnet.utils import Error2IO_Current
@@ -108,9 +108,9 @@ GR_monitor = Monitor(
 )
 PK_monitor = Monitor(
     obj=PK,
-    state_vars=("s", "v"),
-
+    state_vars=("s", "v")
 )
+
 PK_Anti_monitor = Monitor(
     obj=PK_Anti,
     state_vars=("s", "v"),
@@ -146,7 +146,6 @@ network.add_monitor(monitor=IO_monitor, name="IO")
 network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
-encoding_time = 20
 
 T = TrajectoryPlanner()
 T.generate()
@@ -168,19 +167,16 @@ def run_pipeline(MusclePipeline, episode_count):
         MusclePipeline.reset_state_variables()
         while not MusclePipeline.is_done:
             MusclePipeline.step()
-        spikes = {
-            "GR": My_pipe.network.monitors["GR"].get("s"),
-            "PK": My_pipe.network.monitors["PK"].get("s"),
-            #  "PK_Anti":PK_Anti_monitor.get("s"),
-            "IO": My_pipe.network.monitors["IO"].get("s")
-            # "DCN_Anti":DCN_Anti_monitor.get("s")
-        }
+        spikes = {"PK":MusclePipeline.our_monitor.get("s")}
+        plt.ioff()
+
         plot_spikes(spikes)
     MusclePipeline.env.close()
 
 
 print("-"*10+"Training"+"-"*10)
-run_pipeline(My_pipe,5)
+run_pipeline(My_pipe,1)
+plt.show()
 print("-"*10+"Testing"+"-"*10)
 #
 # spikes = {

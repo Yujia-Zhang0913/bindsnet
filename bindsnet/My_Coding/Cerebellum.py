@@ -5,14 +5,14 @@ from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2sp
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes,LIF_Train
 from bindsnet.network.topology import Connection
-from bindsnet.network.monitors import Monitor
+from bindsnet.network.monitors import Monitor,Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
 
 time = 50
-network = Network(dt=0.1)
+network = Network(dt=1)
 # GR_Movement_layer = Input(n=100)
 GR_Joint_layer = Input(n=100, traces=True)
 PK = LIF_Train(n=32, traces=True,refrac=0,thresh=-40)
@@ -136,6 +136,11 @@ DCN_Anti_monitor = Monitor(
     state_vars=("s", "v"),
     time = time
 )
+
+IO_Our_monitor = Our_Monitor(
+    obj = IO,
+    state_vars=("s")
+)
 network.add_monitor(monitor=GR_monitor, name="GR")
 network.add_monitor(monitor=PK_monitor, name="PK")
 network.add_monitor(monitor=PK_Anti_monitor, name="PK_Anti")
@@ -143,6 +148,7 @@ network.add_monitor(monitor=IO_monitor, name="IO")
 network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
+network.add_monitor(monitor=IO_Our_monitor,name="IO_Our_Monitor")
 
 #单次网络输入测试
 encoding_time = 50
@@ -160,40 +166,43 @@ supervise = torch.Tensor([0])
 
 ## 根据监督信号生成电流值 相同监督相同电流
 Curr, Curr_Anti = Error2IO_Current(supervise)
-
+print("Curr: {}".format(Curr))
+print("Curr_Anti: {}".format(Curr_Anti))
 IO_Input = IO_Current2spikes(Curr, neu_IO, encoding_time, dt)               # Supervise_DATA, neural_num, time, dt
 IO_Anti_Input = IO_Current2spikes(Curr_Anti, neu_IO, encoding_time, dt)
 
 
-inputs = {
-            "IO": IO_Input,
-            "GR_Joint_layer": data_Joint,
-          "IO_Anti": IO_Anti_Input
-          }
 
-for i in range(1):
+
+for i in range(10):
+    print('-'*10+str(i)+'-'*10)
+    if i < 7:
+        Curr = torch.Tensor([0])
+        Curr_Anti = torch.Tensor([0])
+    else:
+        Curr = torch.Tensor([0.5])
+        Curr_Anti = torch.Tensor([0.5])
+        # 根据监督信号生成电流值 相同监督相同电流
+    # Curr, Curr_Anti = Error2IO_Current(supervise)
+    print("Curr: {}".format(Curr))
+    print("Curr_Anti: {}".format(Curr_Anti))
+    IO_Input = IO_Current2spikes(Curr, neu_IO, encoding_time, dt)  # Supervise_DATA, neural_num, time, dt
+    print(IO_Input)
+    IO_Anti_Input = IO_Current2spikes(Curr_Anti, neu_IO, encoding_time, dt)
+    inputs = {
+        "IO": IO_Input,
+        "GR_Joint_layer": data_Joint,
+        "IO_Anti": IO_Anti_Input
+    }
     network.run(inputs=inputs, time=time)
 
 
 spikes = {
-    "GR": GR_monitor.get("s"),
-    "PK":PK_monitor.get("s"),
-  #  "PK_Anti":PK_Anti_monitor.get("s"),
-    "IO":IO_monitor.get("s"),
-    "DCN": DCN_monitor.get("s"),
-   # "DCN_Anti":DCN_Anti_monitor.get("s")
-}
-spikes2 = {
-   # "GR": GR_monitor.get("v"),
-    "PK":PK_monitor.get("s")
-  #  "PK_Anti":PK_Anti_monitor.get("s"),
-   # "IO":IO_monitor.get("s"),
-  #  "DCN":DCN_monitor.get("s"),
+    "IO":IO_Our_monitor.get("s"),
+    "DCN": DCN_monitor.get("s")
    # "DCN_Anti":DCN_Anti_monitor.get("s")
 }
 
-weight = Parallelfiber.w
-plot_weights(weights=weight)
 voltages = {
     "DCN": DCN_monitor.get("v"),
     "PK":PK_monitor.get("v"),

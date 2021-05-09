@@ -1,8 +1,8 @@
 import itertools
 from typing import Callable, Optional, Tuple, Dict
-from math import sin,pi
+from math import sin, pi
 import torch
-
+import time
 from tqdm import tqdm
 import numpy as np
 from .base_pipeline import BasePipeline
@@ -10,10 +10,11 @@ from ..analysis.pipeline_analysis import MatplotlibAnalyzer
 from ..environment import Environment, MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
-from ..network.monitors import Monitor, Global_Monitor
+from ..network.monitors import Monitor, Global_Monitor,Our_Monitor
 from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.utils import Error2IO_Current
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
+import matplotlib.pyplot as plt
 
 class TrajectoryPlanner:
     def __init__(self):
@@ -32,7 +33,7 @@ class TrajectoryPlanner:
         #     else:
         #         self.p[i] = max_theta
         for i in range(0, int(self.plan_time / self.step_time + 1)):
-            self.p[i] = 10*sin(0.1*0.1*i-pi/2)+10
+            self.p[i] = 10 * sin(0.1 * 0.1 * i - pi / 2) + 10
 
     def pos_output(self, n_step) -> float:
         """
@@ -406,11 +407,15 @@ class MusclePipeline:
         # save four mainly use obj
         self.env = environment
         self.network = network
-        self.Info_network = {"pos": 0.0, "vel": 0.0,"network":0.0,"anti_network":0.0}
+        self.Info_network = {"pos": 0.0, "vel": 0.0, "network": 0.0, "anti_network": 0.0}
         self.planner = planner
-        self.global_monitor = Global_Monitor(muscle_vars=["pos","vel"],
-                                             net_vars=["network","anti_network"],
+        self.global_monitor = Global_Monitor(muscle_vars=["pos", "vel"],
+                                             net_vars=["network", "anti_network"],
                                              )
+        self.our_monitor = Our_Monitor(
+            obj=self.network.layers["PK"],
+            state_vars=("s", "v")
+        )
 
         # para related with time scale
         self.encoding_time = encoding_time
@@ -433,6 +438,7 @@ class MusclePipeline:
         # generate trajectory
         self.planner.generate()
         self.env.start()
+
     def step(self) -> None:
         # language=rst
         """
@@ -479,16 +485,19 @@ class MusclePipeline:
         # send from info_net to info_err
         self.Receiver()
         # eng step
-        self.env.step(record_list=['pos','vel'], command_list=['network','anti_network'])
+        self.env.step(real_time=self.step_now * 0.1,
+                      record_list=['pos', 'vel'],
+                      command_list=['network', 'anti_network'])
         # monitor add
         self.global_monitor.record(self.env.Info_muscle, self.Info_network)
+        self.our_monitor.record()
         # step sign ++
         self.step_now += 1
-        if self.step_now >= (self.total_time/self.encoding_time):
+        if self.step_now >= (self.total_time / self.encoding_time):
             self.is_done = True
         print(self.step_now)
-        print(self.env.eng.workspace["tout"][self.env.env_step_count])
-        print("error: ",end='')
+        print(self.env.eng.workspace["tout"][-1])
+        print("error: ", end='')
         print(error)
         print(self.planner.pos_output(self.step_now))
         print(self.Info_network["pos"])
@@ -512,13 +521,17 @@ class MusclePipeline:
         # Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, 10.0)
         # DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
         # Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.network.dt, 10.0)
-        PK = self.network.monitors["PK"].get("s")
-        # plot_spikes({"PK":PK})
-        Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 10.0)
-        PK_Anti = self.network.monitors["PK_Anti"].get("s")
-        Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt, 10.0)
-        self.Info_network["network"] = float(Output)
-        self.Info_network["anti_network"] = float(Output_Anti)
+        if self.step_now is 0:
+            self.Info_network["network"] = 0
+            self.Info_network["anti_network"] = 0
+        else:
+            PK = self.network.monitors["PK"].get("s")
+            Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 10.0)
+            PK_Anti = self.network.monitors["PK_Anti"].get("s")
+            Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt,
+                                        10.0)
+            self.Info_network["network"] = float(Output)
+            self.Info_network["anti_network"] = float(Output_Anti)
 
     def reset_state_variables(self) -> None:
         # language=rst
@@ -531,4 +544,3 @@ class MusclePipeline:
         self.network.reset_state_variables()
         self.step_now = 0
         self.is_done = False
-

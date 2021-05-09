@@ -100,6 +100,89 @@ class Monitor(AbstractMonitor):
             }
 
 
+class Our_Monitor(AbstractMonitor):
+    # language=rst
+    """
+    Records state variables of interest.
+    """
+
+    def __init__(
+        self,
+        obj: Union[Nodes, AbstractConnection],
+        state_vars: Iterable[str],
+        time: Optional[int] = None,
+        batch_size: int = 1,
+        device: str = "cpu",
+    ):
+        # language=rst
+        """
+        Constructs a ``Monitor`` object.
+
+        :param obj: An object to record state variables from during network simulation.
+        :param state_vars: Iterable of strings indicating names of state variables to record.
+        :param time: If not ``None``, pre-allocate memory for state variable recording.
+        :param device: Allow the monitor to be on different device separate from Network device
+        """
+        super().__init__()
+
+        self.obj = obj
+        self.state_vars = state_vars
+        self.time = time
+        self.batch_size = batch_size
+        self.device = device
+
+        # if time is not specified the monitor variable accumulate the logs
+        if self.time is None:
+            self.device = "cpu"
+
+        self.recording = []
+        self.reset_state_variables()
+
+    def get(self, var: str) -> torch.Tensor:
+        # language=rst
+        """
+        Return recording to user.
+
+        :param var: State variable recording to return.
+        :return: Tensor of shape ``[time, n_1, ..., n_k]``, where ``[n_1, ..., n_k]`` is the shape of the recorded state
+        variable.
+        Note, if time == `None`, get return the logs and empty the monitor variable
+
+        """
+        return_logs = torch.cat(self.recording[var], 0)
+        # if self.time is None:
+        #     self.recording[var] = []
+        return return_logs
+
+    def record(self) -> None:
+        # language=rst
+        """
+        Appends the current value of the recorded state variables to the recording.
+        """
+        for v in self.state_vars:
+            data = getattr(self.obj, v).unsqueeze(0)
+            # self.recording[v].append(data.detach().clone().to(self.device))
+            self.recording[v].append(
+                torch.empty_like(data, device=self.device, requires_grad=False).copy_(
+                    data, non_blocking=True
+                )
+            )
+            # remove the oldest element (first in the list)
+            if self.time is not None:
+                self.recording[v].pop(0)
+
+    def reset_state_variables(self) -> None:
+        # language=rst
+        """
+        Resets recordings to empty ``List``s.
+        """
+        if self.time is None:
+            self.recording = {v: [] for v in self.state_vars}
+        else:
+            self.recording = {
+                v: [[] for i in range(self.time)] for v in self.state_vars
+            }
+
 class NetworkMonitor(AbstractMonitor):
     # language=rst
     """
@@ -317,7 +400,7 @@ class Global_Monitor(AbstractMonitor):
         super().__init__()
 
         self.muscle_vars = muscle_vars
-        self.net_vars =net_vars
+        self.net_vars = net_vars
         self.time = time
         self.batch_size = batch_size
         self.device = device
@@ -376,6 +459,7 @@ class Global_Monitor(AbstractMonitor):
             # remove the oldest element (first in the list)
             if self.time is not None:
                 self.recording[v].pop(0)
+
 
     def reset_state_variables(self) -> None:
         # language=rst

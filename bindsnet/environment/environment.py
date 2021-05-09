@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict, Any,Optional,Callable
+from typing import Tuple, Dict, Any, Optional, Callable
 
 import gym
 import numpy as np
@@ -7,18 +7,20 @@ import torch
 from ..datasets.preprocess import subsample, gray_scale, binary_image, crop
 from ..encoding import Encoder, NullEncoder
 import torch
+from math import fabs
 import matplotlib.pyplot as plt
 
 from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.network import Network
-from bindsnet.network.nodes import Input, LIFNodes,LIF_Train
+from bindsnet.network.nodes import Input, LIFNodes, LIF_Train
 from bindsnet.network.topology import Connection
 from bindsnet.network.monitors import Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
-from bindsnet.learning import STDP,IO_Record,PostPre,NoOp
+from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
 from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
 import matlab.engine
+
 
 class Environment(ABC):
     # language=rst
@@ -126,7 +128,7 @@ class GymEnvironment(Environment):
         self.reward = None
 
         assert (
-            0.0 < self.max_prob <= 1.0
+                0.0 < self.max_prob <= 1.0
         ), "Maximum spiking probability must be in (0, 1]."
 
     def step(self, a: int) -> Tuple[torch.Tensor, float, bool, Dict[Any, Any]]:
@@ -249,7 +251,7 @@ class GymEnvironment(Environment):
                 self.history[self.history_index] = self.obs
 
             assert (
-                len(self.history) == self.history_length
+                    len(self.history) == self.history_length
             ), "History size is out of bounds"
             self.obs = temp
 
@@ -276,7 +278,7 @@ class MuscleEnvironment:
     """
 
     def __init__(self,
-                 step_min:float=0.1,
+                 step_min: float = 0.1,
                  **kwargs) -> None:
         # language=rst
         """
@@ -288,12 +290,12 @@ class MuscleEnvironment:
         self.eng = matlab.engine.connect_matlab()  # connect the topic
         assert (self.eng is not None), "Failed to connect with  matlab"  # if not, exit
         print("Successfully connected!")
-        self.Info_muscle = {"pos":0,"vel":0}
+        self.Info_muscle = {"pos": 0, "vel": 0}
         self.sim_name = None
-        self.env_step_count = 0
+        self.env_start_flag = True
         self.step_min = step_min
 
-    def start(self,sim_name:str='actuator'):
+    def start(self, sim_name: str = 'actuator'):
         # language=rst
         """
             start the Simulink
@@ -301,12 +303,14 @@ class MuscleEnvironment:
 
         """
         self.sim_name = sim_name
+        self.eng.clear(nargout=0)
         self.eng.load_system(sim_name)  # load the model
-        print("-"*10+"Simulink start"+"-"*10)
+        print("-" * 10 + "Simulink start" + "-" * 10)
 
     def step(self,
-             record_list:list,
-             command_list:list) -> None:
+             real_time:float,
+             record_list: list,
+             command_list: list) -> None:
         # language=rst
         """
            simulate a single step and record output from simulink
@@ -316,27 +320,29 @@ class MuscleEnvironment:
         # Send command to eng
         self.Send_control(command_list)
         # Call eng environment to run for n_mat_step
-        if self.env_step_count is 0:
+        if self.env_start_flag is True:
             self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
+            self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
+            start_t  = self.eng.workspace['tout'][-1]
+            print("start_t: {}".format(start_t))
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
-            self.env_step_count += 1
-        t_now = self.eng.workspace['tout'][self.env_step_count]
+            self.env_start_flag = False
+        t_now = self.eng.workspace['tout'][-1]
         t_now = self.eng.single(t_now)
-        t_next = self.eng.workspace['tout'][self.env_step_count+1]
-        t_next = self.eng.single(t_next)
-        while t_next-t_now<self.step_min:
-            self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
+
+
+        while fabs(t_now-real_time) >= 0.05 and t_now < real_time:
+            # self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
-            self.env_step_count += 1
-            t_next = self.eng.workspace['tout'][self.env_step_count]
-            t_next = self.eng.single(t_next)
+            t_now = self.eng.workspace['tout'][-1]
+            t_now = self.eng.single(t_now)
         # load data from eng to Info
 
         self.Rec_eng_Info(record_list)
 
-    def Rec_eng_Info(self,para_list:list)->None:
+    def Rec_eng_Info(self, para_list: list) -> None:
         # TODO due to the data structure of matlab workspace
         # language=rst
         """
@@ -348,10 +354,10 @@ class MuscleEnvironment:
             print("You want to record empty!")
         else:
             for l in para_list:
-                assert isinstance(l,str),"Invaild record key! Key must be string type"
-                self.Info_muscle[l] = self.eng.single(self.eng.workspace[l][self.env_step_count][1])
+                assert isinstance(l, str), "Invaild record key! Key must be string type"
+                self.Info_muscle[l] = self.eng.single(self.eng.workspace[l][-1][1])
 
-    def Send_control(self,command_list:list):
+    def Send_control(self, command_list: list):
         # TODO due to the data structure of matlab workspace
         # language=rst
         """
@@ -363,8 +369,8 @@ class MuscleEnvironment:
             print("You want to record empty!")
         else:
             for c in command_list:
-                assert isinstance(c,str),"Invaild command key! Key must be string type"
-                assert self.Info_muscle.get(c) is not None,"No such key in Info_muscle"
+                assert isinstance(c, str), "Invaild command key! Key must be string type"
+                assert self.Info_muscle.get(c) is not None, "No such key in Info_muscle"
                 self.eng.workspace[c] = self.Info_muscle[c]
 
     def reset(self) -> None:
@@ -372,17 +378,19 @@ class MuscleEnvironment:
         """
         reset eng and clear the Info dictionary
         """
-        self.eng.run("Para_in.m",nargout=0)  # load the data again
-        self.Info_muscle = {"pos":0,"vel":0}
-        self.env_step_count = 0
+        self.eng.run("Para_in.m", nargout=0)  # load the data again
+        self.Info_muscle = {"pos": 0, "vel": 0}
+        self.env_start_flag = True
+
     def close(self) -> None:
         # language=rst
         """
         Wrapper around the OpenAI ``gym`` environment ``close()`` function.
         """
-        assert self.sim_name is not None,"No simulink is running!"
+        assert self.sim_name is not None, "No simulink is running!"
         self.eng.set_param(self.sim_name, "SimulationCommand", "stop", nargout=0)
         self.eng.clear(nargout=0)
+
     def render(self) -> None:
         # language=rst
         """
