@@ -33,7 +33,7 @@ Parallelfiber = Connection(
     wmin=0,
     wmax=10,
     update_rule=STDP,
-    nu=0.1,
+    nu=[0.1,0.3],
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
 )
 
@@ -42,7 +42,7 @@ Parallelfiber_Anti = Connection(
     target=PK_Anti,
     wmin=0,
     wmax=10,
-    nu=0.1,
+    nu=[0.1,0.3],
     update_rule=STDP,
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n)
 )
@@ -167,15 +167,16 @@ def run_pipeline(MusclePipeline, episode_count):
         MusclePipeline.reset_state_variables()
         while not MusclePipeline.is_done:
             MusclePipeline.step()
-        spikes = {"PK":MusclePipeline.our_monitor.get("s")}
-        plt.ioff()
-
-        plot_spikes(spikes)
+        # spikes = {"PK":MusclePipeline.our_monitor.get("s")}
+        # plt.ioff()
+        #
+        # plot_spikes(spikes)
     MusclePipeline.env.close()
 
 
 print("-"*10+"Training"+"-"*10)
 run_pipeline(My_pipe,1)
+My_pipe.network.save("net")
 plt.show()
 print("-"*10+"Testing"+"-"*10)
 #

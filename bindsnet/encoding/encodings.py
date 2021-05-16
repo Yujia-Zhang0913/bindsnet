@@ -75,7 +75,6 @@ def bernoulli(
     max_prob = kwargs.get("max_prob", 1.0)
     assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
     assert (datum >= 0).all(), "Inputs must be non-negative"
-    datum = np.copy(datum)
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
 
@@ -120,7 +119,7 @@ def poisson(
     :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Poisson-distributed spikes.
     """
     assert (datum >= 0).all(), "Inputs must be non-negative"
-    datum = np.copy(datum)
+
     # Get shape and size of data.
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
@@ -397,15 +396,22 @@ def Decode_Output(
     datum = torch.squeeze(datum, 1)
     RATE = torch.zeros(neural_num)
     Output = torch.zeros(neural_num)
+    Weight = torch.zeros(neural_num)
 
     times = torch.sum(datum, 0)
     RATE = times / (time/dt)
 
+    RATE = torch.sigmoid(RATE)   #输出层细胞，增强非线性
+
     for i in range(neural_num):
         Output[i] = RATE[i] * (i*bound/neural_num)
+        Weight[i] = i*bound/neural_num
 
+    Weight = torch.sum(Weight)
     Output = torch.sum(Output)
-    Output = torch.sigmoid(Output)
+
+    Output = bound * Output /torch.sum(Weight)      #控制范围
+
     return Output
 
 

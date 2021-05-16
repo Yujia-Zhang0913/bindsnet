@@ -3,7 +3,7 @@ from typing import Dict, Optional, Type, Iterable
 
 import torch
 
-from .monitors import AbstractMonitor
+from .monitors import AbstractMonitor,Our_Monitor
 from .nodes import Nodes, CSRMNodes
 from .topology import AbstractConnection
 from ..learning.reward import AbstractReward
@@ -339,6 +339,8 @@ class Network(torch.nn.Module):
                         self.layers[l].set_batch_size(self.batch_size)
 
                     for m in self.monitors:
+                        if isinstance(m,Our_Monitor):
+                            continue
                         self.monitors[m].reset_state_variables()
 
                 break

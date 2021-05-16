@@ -33,7 +33,7 @@ class TrajectoryPlanner:
         #     else:
         #         self.p[i] = max_theta
         for i in range(0, int(self.plan_time / self.step_time + 1)):
-            self.p[i] = 10 * sin(0.1 * 0.1 * i - pi / 2) + 10
+            self.p[i] = 10 * sin(0.1 * 0.2 * i - pi / 2) + 10
 
     def pos_output(self, n_step) -> float:
         """
@@ -437,7 +437,7 @@ class MusclePipeline:
 
         # generate trajectory
         self.planner.generate()
-        self.env.start()
+        self.env.start(sim_name='actuator_2')
 
     def step(self) -> None:
         # language=rst
@@ -526,10 +526,10 @@ class MusclePipeline:
             self.Info_network["anti_network"] = 0
         else:
             PK = self.network.monitors["PK"].get("s")
-            Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 10.0)
+            Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
             PK_Anti = self.network.monitors["PK_Anti"].get("s")
             Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt,
-                                        10.0)
+                                        1)
             self.Info_network["network"] = float(Output)
             self.Info_network["anti_network"] = float(Output_Anti)
 

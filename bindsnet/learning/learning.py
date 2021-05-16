@@ -337,7 +337,9 @@ class STDP(LearningRule):
 
         # clear all spike record for target.IO_s:
         self.target.IO_s.masked_fill_(self.target.IO_s != 0, 0)
+
         super().update()
+        print(self.connection.w)
 
 
 class IO_Record(LearningRule):
