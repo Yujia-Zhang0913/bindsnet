@@ -45,6 +45,7 @@ environment_pipeline = EnvironmentPipeline(
     encoding=bernoulli,
     action_function=select_softmax,
     output="Output Layer",
+    plot_config={"data_step": True, "data_length": 100, "volts_type": "line"},
     time=100,
     history_length=1,
     delta=1,
@@ -70,7 +71,7 @@ def run_pipeline(pipeline, episode_count):
 
 
 print("Training: ")
-run_pipeline(environment_pipeline, episode_count=100)
+run_pipeline(environment_pipeline, episode_count=10)
 
 # stop MSTDP
 environment_pipeline.network.learning = False

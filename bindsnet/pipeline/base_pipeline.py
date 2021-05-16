@@ -127,10 +127,12 @@ class BasePipeline:
             self.print_interval is not None
             and self.step_count % self.print_interval == 0
         ):
+            print("-"*20)
             print(
                 f"Iteration: {self.step_count} (Time: {time.time() - self.clock:.4f})"
             )
             self.clock = time.time()
+            self.print_message()
 
         self.plots(batch, step_out)
 
@@ -218,3 +220,10 @@ class BasePipeline:
         :param step_out: The output from the ``step_()`` method.
         """
         raise NotImplementedError("You need to provide a plots method.")
+
+    def print_message(self) -> None:
+        # language=rst
+        """
+        Create any prints and logs for a step given the input batch and step output.
+        """
+        raise NotImplementedError("You need to provide a print method.")

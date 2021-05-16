@@ -339,7 +339,6 @@ class STDP(LearningRule):
         self.target.IO_s.masked_fill_(self.target.IO_s != 0, 0)
 
         super().update()
-        print(self.connection.w)
 
 
 class IO_Record(LearningRule):
@@ -748,6 +747,7 @@ class MSTDP(LearningRule):
         ) + torch.bmm(source_s.unsqueeze(2), self.p_minus.unsqueeze(1))
 
         super().update()
+        print(self.connection.w)
 
     def _conv2d_connection_update(self, **kwargs) -> None:
         # language=rst

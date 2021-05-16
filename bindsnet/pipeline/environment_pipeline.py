@@ -10,11 +10,12 @@ from ..analysis.pipeline_analysis import MatplotlibAnalyzer
 from ..environment import Environment, MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
-from ..network.monitors import Monitor, Global_Monitor,Our_Monitor
-from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
+from ..network.monitors import Monitor, Global_Monitor, Our_Monitor
+from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output,bernoulli
 from bindsnet.utils import Error2IO_Current
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 import matplotlib.pyplot as plt
+
 
 class TrajectoryPlanner:
     def __init__(self):
@@ -299,6 +300,7 @@ class EnvironmentPipeline(BasePipeline):
                 k: self.encoding(obs, self.time, device=self.device)
                 for k in self.inputs
             }
+            print(inputs)  # TODO
 
         # Run the network on the spike train-encoded inputs.
         self.network.run(inputs=inputs, time=self.time, reward=reward, **kwargs)
@@ -376,6 +378,7 @@ class MusclePipeline(BasePipeline):
             receive_list: list,
             kv: float,
             kx: float,
+            encoding: Optional[Callable] = bernoulli_RBF,
             **kwargs,
     ):
         # language=rst
@@ -393,11 +396,11 @@ class MusclePipeline(BasePipeline):
         :param kx: error co for pos
         """
 
-        super().__init__(network,**kwargs)
+        super().__init__(network, **kwargs)
 
         self.episode = 0
         self.plot_interval = kwargs.get("plot_interval", None)
-        if self.plot_config["data_length"] is not  encoding_time:
+        if self.plot_config["data_length"] is not encoding_time:
             print("plot_time mismatch")
             self.plot_config["data_length"] = encoding_time
         self.analyzer = MatplotlibAnalyzer(**self.plot_config)
@@ -435,36 +438,44 @@ class MusclePipeline(BasePipeline):
         # generate trajectory
         self.planner.generate()
         self.env.start(sim_name='actuator_2')
+        self.REC_DICT = {"error": 0.0, "curr": 0.0, "curr_anti": 0.0}
+        self.encoding = encoding
+
     def init_fn(self) -> None:
         pass
 
-    def step_(self,batch=1,**kwargs) -> int:
+    def step_(self, batch=1, **kwargs) -> int:
         # language=rst
         """
         Single step of the environment which includes rendering, getting and performing
         the action, and accumulating/delaying rewards.
 
         """
-        # encode desired joint posistion
+        # encode desired joint position
         # TODO only pos no vel
-        desired_pos = bernoulli_RBF(self.planner.pos_output(self.step_now),
+        desired_pos = self.encoding(self.planner.pos_output(self.step_now),
                                     self.network.layers["GR_Joint_layer"].n,
                                     self.encoding_time,
                                     self.network.dt
                                     )
-        desired_vel = bernoulli_RBF(self.planner.vel_output(self.step_now),
-                                    self.network.layers["GR_Joint_layer"].n,
-                                    self.encoding_time,
-                                    self.network.dt
-                                    )
+        # desired_vel =self.encoding(self.planner.vel_output(self.step_now),
+        #                             self.network.layers["GR_Joint_layer"].n,
+        #                             self.encoding_time,
+        #                             self.network.dt
+        #                             )
+
         self.Sender()
 
         # get pos and vel from Info_network and
         # [pos,vel] -> error -> current -> spike(input)
-        # error = self.kx * (desired_pos - self.Info_network["pos"]) + self.kv * (desired_vel - self.Info_network["vel"])
+        # self.error = self.kx * (desired_pos - self.Info_network["pos"]) + self.kv * (desired_vel - self.Info_network["vel"])
         error = self.kx * (self.planner.pos_output(self.step_now) - self.Info_network["pos"])
 
         curr, curr_anti = Error2IO_Current(error)
+        self.REC_DICT["error"] = error
+        self.REC_DICT["curr"] = curr
+        self.REC_DICT["curr_anti"] = curr_anti
+
         IO_input = IO_Current2spikes(curr,
                                      neural_num=self.network.layers["IO"].n,
                                      time=self.encoding_time,
@@ -494,14 +505,6 @@ class MusclePipeline(BasePipeline):
         self.step_now += 1
         if self.step_now >= (self.total_time / self.encoding_time):
             self.is_done = True
-        print(self.step_now)
-        print(self.env.eng.workspace["tout"][-1])
-        print("error: ", end='')
-        print(error)
-        print(self.planner.pos_output(self.step_now))
-        print(self.Info_network["pos"])
-        print("Network command:{}".format(self.Info_network['network']))
-        print("Anti_Network command:{}".format(self.Info_network['anti_network']))
         return 1
 
     def Sender(self):
@@ -569,3 +572,23 @@ class MusclePipeline(BasePipeline):
             #         self.analyzer.plot_reward(self.reward_list)
 
         self.analyzer.finalize_step()
+
+    def print_message(self) -> None:
+        # language=rst
+        """
+        Plot the encoded input, layer spikes, and layer voltages.
+
+        :param batch: default 1
+        """
+        print("-"*10+"Error and input"+"-"*10)
+        print("error: {} = Kx * desire_pos: {} - real_pos: {}".format(self.REC_DICT["error"],
+                                                                      self.planner.pos_output(self.step_now - 1),
+                                                                      self.Info_network["pos"]))
+        print("Error to Current: curr: {}   curr_anti:{}".format(self.REC_DICT["curr"], self.REC_DICT["curr_anti"]))
+        print("Curr to spikes")
+        print("-"*10+"Net running"+"-"*10)
+        print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
+        print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
+        print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"], self.Info_network["anti_network"]))
+
+        pass

@@ -190,12 +190,14 @@ def rank_order(
 
     return spikes.reshape(time, *shape)
 
+
 def bernoulli_RBF(
     datum: Optional[Union[float, torch.Tensor]],                # [n_1]
     neural_num: int,                    # GR输入细胞的个数
     time: Optional[int] = None,         # 编码的真实时间长度
     dt: float = 1.0,                    # 网络中仿真的长度
-    device="cpu",                       # RESULT: shape [time/dt,neural_num]
+    device="cpu",# RESULT: shape [time/dt,neural_num]
+    max=30,
     **kwargs
 ) -> torch.Tensor:
     # language=rst
@@ -208,6 +210,8 @@ def bernoulli_RBF(
     :param datum: Tensor of shape ``[n_1, ..., n_k]``.
     :param time: Length of Bernoulli spike train per input variable.
     :param dt: Simulation time step.
+    :param neural_num: num of neural_num
+    :param device: "CPU" "GPU"
     :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Bernoulli-distributed spikes.
 
     Keyword arguments:
@@ -221,7 +225,9 @@ def bernoulli_RBF(
     max_prob = kwargs.get("max_prob", 1.0)
     assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
     assert (datum >= 0).all(), "Inputs must be non-negative"
-
+    datum = datum/max
+    if datum>1:
+        datum=1
     #Create RBF 10Inputs
     RBF = []                               #range from the min of input to the max
     for i in range(neural_num):            #Adjust the number of the ner
@@ -233,10 +239,11 @@ def bernoulli_RBF(
 
     # Get the rate matrix of (time/dt, neural_num)
     RATE = []
+    omiga = 1/neural_num/3  # 1.5 omiga equals margin
     for t in range(Time_network):
         for i in RBF:
             delta_X = datum.data - i
-            rate = math.exp(-(delta_X * delta_X) / 2) / math.sqrt(2 * math.pi)
+            rate = math.exp(-(delta_X * delta_X) / 2/omiga**2) # TODO make some changes
             RATE.append(rate)
 
     Final_Input = torch.Tensor(RATE)
@@ -247,9 +254,6 @@ def bernoulli_RBF(
     # Make spike data from Bernoulli sampling.
     spikes = torch.bernoulli(max_prob * Final_Input).to(device)
     spikes = spikes.view(*shape)
-
-    print("----The encoding of Input variable during (time / dt)----")
-
     return spikes.byte()
 
 def poisson_IO(
@@ -324,6 +328,7 @@ def IO_Current2spikes(
     dt: float = 1.0,
     device="cpu",
     approx=False,
+    visual=False,
     **kwargs
 ) -> torch.Tensor:
 
@@ -373,12 +378,10 @@ def IO_Current2spikes(
 
         spike = torch.Tensor(spike)
         Final_spike = torch.cat((spike, Final_spike), 0)
-
-
     Final_spike = Final_spike.resize(Time_network, neural_num)
-
-    print("----The encoding of Input supervisor during (time / dt)----")
-
+    if visual:
+        print("-"*10+"Current2Spike"+"-"*10)
+        print(Final_spike.byte())
     return Final_spike.byte()
 
 
@@ -390,6 +393,7 @@ def Decode_Output(
     bound: float = 10.0,
     device="cpu",
     approx=False,
+    visual=False,
     **kwargs
 ) -> torch.Tensor:
 
@@ -411,7 +415,9 @@ def Decode_Output(
     Output = torch.sum(Output)
 
     Output = bound * Output /torch.sum(Weight)      #控制范围
-
+    if visual: # TODO
+        print("-"*10+"Decode"+"-"*10)
+        pass
     return Output
 
 

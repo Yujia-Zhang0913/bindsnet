@@ -31,9 +31,9 @@ Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
     wmin=0,
-    wmax=10,
+    wmax=1,
     update_rule=STDP,
-    nu=[0.1,0.3],
+    nu=[0.1,0.1],
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
 )
 
@@ -41,8 +41,8 @@ Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
     wmin=0,
-    wmax=10,
-    nu=[0.1,0.3],
+    wmax=1,
+    nu=[0.1,0.1],
     update_rule=STDP,
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n)
 )
@@ -124,6 +124,7 @@ IO_monitor = Monitor(
 )
 IO_Anti_monitor = Monitor(
     obj=IO_Anti,
+
     state_vars=("s"),
 
 )
@@ -164,7 +165,8 @@ My_pipe = MusclePipeline(network=network,
                          send_list=["pos", "vel"],
                          allow_gpu=False,
                          kv=1,
-                         kx=10)
+                         kx=10,
+                         )
 
 
 def run_pipeline(pipeline, episode_count):
