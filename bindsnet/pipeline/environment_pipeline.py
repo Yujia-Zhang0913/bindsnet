@@ -358,7 +358,7 @@ class EnvironmentPipeline(BasePipeline):
         self.analyzer.finalize_step()
 
 
-class MusclePipeline:
+class MusclePipeline(BasePipeline):
     # language=rst
     """
     Abstracts the interaction between ``Network``, ``Environment``, and environment
@@ -384,29 +384,26 @@ class MusclePipeline:
 
         :param network: Arbitrary network object.
         :param environment: Arbitrary environment.
-        :param action_function: Function to convert network outputs into environment inputs.
-        :param encoding: Function to encoding input.
-        Keyword arguments:
-
-        :param str device: PyTorch computing device
-        :param encode_factor: coefficient for the input before encoding.
-        :param int num_episodes: Number of episodes to train for. Defaults to 100.
-        :param str output: String name of the layer from which to take output.
-        :param int render_interval: Interval to render the environment.
-        :param int reward_delay: How many iterations to delay delivery of reward.
-        :param int time: Time for which to run the network. Defaults to the network's
-        :param int overlay_input: Overlay the last X previous input
-        :param float percent_of_random_action: chance to choose random action
-        :param int random_action_after: take random action if same output action counter reach
-
-            timestep.
+        :param planner: Trajectory planner
+        :param encoding_time: encoding time for one input
+        :param total_time: total running time
+        :param send_list: send from env to network
+        :param receive_list: send from network to env
+        :param kv: error co for vel
+        :param kx: error co for pos
         """
 
+        super().__init__(network,**kwargs)
+
         self.episode = 0
+        self.plot_interval = kwargs.get("plot_interval", None)
+        if self.plot_config["data_length"] is not  encoding_time:
+            print("plot_time mismatch")
+            self.plot_config["data_length"] = encoding_time
+        self.analyzer = MatplotlibAnalyzer(**self.plot_config)
 
         # save four mainly use obj
         self.env = environment
-        self.network = network
         self.Info_network = {"pos": 0.0, "vel": 0.0, "network": 0.0, "anti_network": 0.0}
         self.planner = planner
         self.global_monitor = Global_Monitor(muscle_vars=["pos", "vel"],
@@ -430,16 +427,18 @@ class MusclePipeline:
 
         self.is_done = False
         # set GPU or CPU
-        # if torch.cuda.is_available() and self.allow_gpu:
-        #     self.device = torch.device("cuda")
-        # else:
-        #     self.device = torch.device("cpu")
+        if torch.cuda.is_available() and self.allow_gpu:
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
 
         # generate trajectory
         self.planner.generate()
         self.env.start(sim_name='actuator_2')
+    def init_fn(self) -> None:
+        pass
 
-    def step(self) -> None:
+    def step_(self,batch=1,**kwargs) -> int:
         # language=rst
         """
         Single step of the environment which includes rendering, getting and performing
@@ -503,6 +502,7 @@ class MusclePipeline:
         print(self.Info_network["pos"])
         print("Network command:{}".format(self.Info_network['network']))
         print("Anti_Network command:{}".format(self.Info_network['anti_network']))
+        return 1
 
     def Sender(self):
         for l in self.send_list:
@@ -544,3 +544,28 @@ class MusclePipeline:
         self.network.reset_state_variables()
         self.step_now = 0
         self.is_done = False
+
+    def plots(self, batch=1, *args) -> None:
+        # language=rst
+        """
+        Plot the encoded input, layer spikes, and layer voltages.
+
+        :param batch: default 1
+        """
+
+        if self.plot_interval is None:
+            return
+
+        for key, item in self.plot_config.items():
+            # if key == "obs_step" and item is not None:
+            #     if self.step_count % item == 0:
+            #         self.analyzer.plot_obs(obs[0, ...].sum(0))
+            if key == "data_step" and item is not None:
+                if self.step_count % item == 0:
+                    self.analyzer.plot_spikes(self.get_spike_data())
+                    self.analyzer.plot_voltages(*self.get_voltage_data())
+            # elif key == "reward_eps" and item is not None:
+            #     if self.episode % item == 0 and done:
+            #         self.analyzer.plot_reward(self.reward_list)
+
+        self.analyzer.finalize_step()

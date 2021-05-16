@@ -153,30 +153,34 @@ T.generate()
 env = MuscleEnvironment()
 My_pipe = MusclePipeline(network=network,
                          environment=env,
+                         save_interval=5,
+                         print_interval=1,
+                         plot_interval=1,
+                         plot_config={"data_step": True, "data_length": 50,"volts_type":"line"},
                          planner=T,
                          encoding_time=50,
                          total_time=5000,
                          receive_list=["network", "anti_network"],
                          send_list=["pos", "vel"],
+                         allow_gpu=False,
                          kv=1,
                          kx=10)
 
 
-def run_pipeline(MusclePipeline, episode_count):
+def run_pipeline(pipeline, episode_count):
     for i in range(episode_count):
-        MusclePipeline.reset_state_variables()
-        while not MusclePipeline.is_done:
-            MusclePipeline.step()
+        pipeline.reset_state_variables()
+        while not pipeline.is_done:
+            pipeline.step(1)
         # spikes = {"PK":MusclePipeline.our_monitor.get("s")}
         # plt.ioff()
         #
         # plot_spikes(spikes)
-    MusclePipeline.env.close()
+    pipeline.env.close()
 
 
 print("-"*10+"Training"+"-"*10)
 run_pipeline(My_pipe,1)
-My_pipe.network.save("net")
 plt.show()
 print("-"*10+"Testing"+"-"*10)
 #
