@@ -18,19 +18,21 @@ from bindsnet.environment.environment import MuscleEnvironment
 network = Network(dt=1)
 
 # nodes
-MF_layer = Input(n=400,traces=True) # 50 group each 8 
-GR_Joint_layer = LIFNodes(traces=True, refrac=0, shape=(5, 200))
-PK = LIF_Train(n=32, traces=True, refrac=0)
-PK_Anti = LIF_Train(n=32, traces=True, refrac=0)
-IO = Input(n=32, traces=True, is_IO=True, refrac=0)
-IO_Anti = Input(n=32, traces=True, is_IO=True, refrac=0)
-DCN = LIFNodes(n=100, traces=True, refrac=0)
-DCN_Anti = LIFNodes(n=100, trace=True, refrac=0)
+MF_layer = Input(n=400,traces=True) # 50 group each 8
+GR_Joint_layer = LIFNodes(n=1000,traces=True, refrac=0)
+PK = LIF_Train(n=80, traces=True, refrac=0)
+PK_Anti = LIF_Train(n=80, traces=True, refrac=0)
+IO = Input(n=80, traces=True, is_IO=True, refrac=0)
+IO_Anti = Input(n=80, traces=True, is_IO=True, refrac=0)
+IO_new = Input(n=80, traces=True, refrac=0)
+IO_Anti_new = Input(n=80, traces=True, refrac=0)
+DCN = LIFNodes(n=80, traces=True, refrac=0)
+DCN_Anti = LIFNodes(n=80, trace=True, refrac=0)
 
 MF_fiber = Group_Connection(
     source=MF_layer,
     target=GR_Joint_layer,
-    w=1
+    w=0.2
 )
 
 # add Connection
@@ -79,17 +81,18 @@ PK_DCN_Anti = Connection(
     w=-0.1 * torch.ones(PK_Anti.n, DCN_Anti.n)
 )
 
-GR_DCN = Connection(
-    source=GR_Joint_layer,
+IO_DCN = Connection(
+    source=IO_new,
     target=DCN,
-    w=0.1 * torch.ones(GR_Joint_layer.n, DCN.n)
+    w=0.1 * torch.ones(IO_new.n, DCN.n)
 )
 
-GR_DCN_Anti = Connection(
-    source=GR_Joint_layer,
+IO_DCN_Anti = Connection(
+    source=IO_Anti_new,
     target=DCN_Anti,
-    w=0.1 * torch.ones(GR_Joint_layer.n, DCN_Anti.n)
+    w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
 )
+
 network.add_layer(layer=MF_layer, name="MF_layer")
 network.add_layer(layer=GR_Joint_layer, name="GR_Joint_layer")
 network.add_layer(layer=PK, name="PK")
@@ -98,6 +101,8 @@ network.add_layer(layer=IO, name="IO")
 network.add_layer(layer=IO_Anti, name="IO_Anti")
 network.add_layer(layer=DCN, name="DCN")
 network.add_layer(layer=DCN_Anti, name="DCN_Anti")
+network.add_layer(layer=IO_new,name="IO_new")
+network.add_layer(layer=IO_Anti_new,name="IO_Anti_new")
 
 network.add_connection(connection=MF_fiber, source="MF_layer", target="GR_Joint_layer")
 network.add_connection(connection=Climbingfiber, source="IO", target="PK")
@@ -107,8 +112,8 @@ network.add_connection(connection=Parallelfiber_Anti, source="GR_Joint_layer", t
 
 network.add_connection(connection=PK_DCN, source="PK", target="DCN")
 network.add_connection(connection=PK_DCN_Anti, source="PK_Anti", target="DCN_Anti")
-network.add_connection(connection=GR_DCN, source="GR_Joint_layer", target="DCN")
-network.add_connection(connection=GR_DCN_Anti, source="GR_Joint_layer", target="DCN_Anti")
+network.add_connection(connection=IO_DCN, source="IO_new", target="DCN")
+network.add_connection(connection=IO_DCN_Anti, source="IO_Anti_new", target="DCN_Anti")
 
 MF_monitor = Monitor(
     obj=MF_layer,
@@ -130,17 +135,13 @@ PK_Anti_monitor = Monitor(
     state_vars=("s", "v"),
 
 )
-
 IO_monitor = Monitor(
-    obj=IO,
-    state_vars="s",
-
+    obj=IO_new,
+    state_vars=("s")
 )
 IO_Anti_monitor = Monitor(
-    obj=IO_Anti,
-
-    state_vars="s",
-
+    obj = IO_Anti_new,
+    state_vars=("s")
 )
 
 DCN_monitor = Monitor(
@@ -158,8 +159,8 @@ network.add_monitor(monitor=MF_monitor, name="MF")
 network.add_monitor(monitor=GR_monitor, name="GR")
 network.add_monitor(monitor=PK_monitor, name="PK")
 network.add_monitor(monitor=PK_Anti_monitor, name="PK_Anti")
-network.add_monitor(monitor=IO_monitor, name="IO")
-network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti")
+network.add_monitor(monitor=IO_monitor, name="IO_monitor")
+network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti_monitor")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
 

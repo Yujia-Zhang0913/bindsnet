@@ -389,7 +389,7 @@ class IO_Record(LearningRule):
         Post-pre learning rule for ``Connection`` subclass of ``AbstractConnection``
         class.
         """
-        self.target.IO_s = self.source.IO_spike.clone()  # 记录 是否有脉冲，一定要有clone
+        self.target.IO_s = self.source.I.clone()  # 记录 是否有脉冲，一定要有clone
         # TODO fucking bugs
 
         super().update()

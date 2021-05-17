@@ -225,7 +225,7 @@ class Input(Nodes, AbstractInput):
             self.s = x
         else:
             self.s = torch.zeros_like(x)
-            self.IO_spike = x
+            self.I = x
 
         super().forward(x)
 

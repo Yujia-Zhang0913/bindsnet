@@ -124,10 +124,10 @@ class BasePipeline:
         step_out = self.step_(batch, **kwargs)
 
         if (
-            self.print_interval is not None
-            and self.step_count % self.print_interval == 0
+                self.print_interval is not None
+                and self.step_count % self.print_interval == 0
         ):
-            print("-"*20)
+            print("-" * 20)
             print(
                 f"Iteration: {self.step_count} (Time: {time.time() - self.clock:.4f})"
             )
@@ -151,13 +151,13 @@ class BasePipeline:
 
         :return: A dictionary containing all spike monitors from the network.
         """
-        return {
-            l: self.network.monitors[f"{l}_spikes"].get("s")
-            for l in self.network.layers
-        }
+        data = {}
+        for l in self.network.layers:
+            data[l] = self.network.monitors[f"{l}_spikes"].get("s")
+        return data
 
     def get_voltage_data(
-        self,
+            self,
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor]]:
         # language=rst
         """

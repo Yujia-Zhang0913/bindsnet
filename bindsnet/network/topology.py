@@ -127,6 +127,7 @@ class Connection(AbstractConnection):  # full connection
             nu: Optional[Union[float, Sequence[float]]] = None,
             reduction: Optional[callable] = None,
             weight_decay: float = 0.0,
+            is_IO=False,
             **kwargs
     ) -> None:
         # language=rst

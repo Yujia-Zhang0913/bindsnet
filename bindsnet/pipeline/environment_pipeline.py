@@ -486,7 +486,9 @@ class MusclePipeline(BasePipeline):
         inputs = {
             "IO": IO_input,
             "MF_layer": desired_pos,
-            "IO_Anti": IO_anti_input
+            "IO_Anti": IO_anti_input,
+            "IO_new":IO_input,
+            "IO_Anti_new":IO_anti_input
         }
         # run the network and write into the Info_network
         self.network_run(inputs)
@@ -585,7 +587,7 @@ class MusclePipeline(BasePipeline):
         print("Error to Current: curr: {}   curr_anti:{}".format(self.REC_DICT["curr"], self.REC_DICT["curr_anti"]))
         print("Curr to spikes")
         print("-" * 10 + "Net running" + "-" * 10)
-        print("Weight:{}".format(self.network.connections[("MF_layer", "GR_Joint_layer")].w.shape))
+        print("Weight:{}".format(self.network.connections[("MF_layer", "GR_Joint_layer")].w))
         # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
         # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
         print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"],
