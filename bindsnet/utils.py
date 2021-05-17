@@ -263,11 +263,6 @@ def Error2IO_Current(
         Current_Anti = torch.Tensor([Current_Anti / max_current])
 
     # TODO 简化了静息状态的操作
-    print("----The result of error to current----")
-    print("Current : ",end='')
-    print(Current)
-    print("Current_Anti : ",end='')
-    print(Current_Anti)
 
     return Current, Current_Anti
 

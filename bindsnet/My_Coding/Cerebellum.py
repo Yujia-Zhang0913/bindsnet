@@ -175,7 +175,11 @@ for i in range(1):
     if i > 5:
         Curr = torch.Tensor([0])
         Curr_Anti = torch.Tensor([0])
+        a = torch.Tensor([0.5])
+        data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)  # Input_DATA, neural_num, time, dt
     else:
+        a = torch.Tensor([1])
+        data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)  # Input_DATA, neural_num, time, dt
         Curr = torch.Tensor([0.5])
         Curr_Anti = torch.Tensor([0.5])
         # 根据监督信号生成电流值 相同监督相同电流
@@ -194,6 +198,7 @@ for i in range(1):
 
 spikes = {
     "IO": IO_Our_monitor.get("s"),
+    "GR_Joint_layer":GR_monitor.get("s"),
     "DCN": DCN_monitor.get("s")
     # "DCN_Anti":DCN_Anti_monitor.get("s")
 }

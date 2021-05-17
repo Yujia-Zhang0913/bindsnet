@@ -12,6 +12,7 @@ from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
 from bindsnet.pipeline.environment_pipeline import MusclePipeline, TrajectoryPlanner
 from bindsnet.environment.environment import MuscleEnvironment
+torch.set_printoptions(precision=None, threshold=2000, edgeitems=None, linewidth=None, profile=None, sci_mode=None)
 
 # time = 50
 # network
@@ -35,8 +36,8 @@ Parallelfiber = Connection(
     update_rule=STDP,
     nu=[0.1,0.1],
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
+    norm=0.5 * GR_Joint_layer.n
 )
-
 Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
@@ -44,7 +45,8 @@ Parallelfiber_Anti = Connection(
     wmax=1,
     nu=[0.1,0.1],
     update_rule=STDP,
-    w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n)
+    w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
+    norm=0.5 * GR_Joint_layer.n
 )
 
 Climbingfiber = Connection(
@@ -165,7 +167,7 @@ My_pipe = MusclePipeline(network=network,
                          send_list=["pos", "vel"],
                          allow_gpu=False,
                          kv=1,
-                         kx=10,
+                         kx=1,
                          )
 
 

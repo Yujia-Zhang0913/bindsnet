@@ -254,6 +254,8 @@ def bernoulli_RBF(
     # Make spike data from Bernoulli sampling.
     spikes = torch.bernoulli(max_prob * Final_Input).to(device)
     spikes = spikes.view(*shape)
+    torch.set_printoptions(precision=None, threshold=6000, edgeitems=None, linewidth=None, profile=None, sci_mode=None)
+    print(spikes.byte())
     return spikes.byte()
 
 def poisson_IO(
