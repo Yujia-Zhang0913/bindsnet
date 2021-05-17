@@ -11,10 +11,11 @@ from ..environment import Environment, MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
 from ..network.monitors import Monitor, Global_Monitor, Our_Monitor
-from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output, bernoulli
+from bindsnet.encoding import bernoulli_RBF, bernoulli_pre, poisson_IO, IO_Current2spikes, Decode_Output, bernoulli
 from bindsnet.utils import Error2IO_Current
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 import matplotlib.pyplot as plt
+import math
 
 
 class TrajectoryPlanner:
@@ -378,7 +379,6 @@ class MusclePipeline(BasePipeline):
             receive_list: list,
             kv: float,
             kx: float,
-            encoding: Optional[Callable] = bernoulli_RBF,
             **kwargs,
     ):
         # language=rst
@@ -439,7 +439,6 @@ class MusclePipeline(BasePipeline):
         self.planner.generate()
         self.env.start(sim_name='actuator_2')
         self.REC_DICT = {"error": 0.0, "curr": 0.0, "curr_anti": 0.0}
-        self.encoding = encoding
 
     def init_fn(self) -> None:
         pass
@@ -453,11 +452,14 @@ class MusclePipeline(BasePipeline):
         """
         # encode desired joint position
         # TODO only pos no vel
-        desired_pos = self.encoding(self.planner.pos_output(self.step_now),
-                                    self.network.layers["MF_layer"].n,
-                                    self.encoding_time,
-                                    self.network.dt
+        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now),num_group=50)
+        desired_pos = bernoulli_RBF(datum=Input_RATE,
+                                    neural_num=self.network.layers["MF_layer"].n,
+                                    time=self.encoding_time,
+                                    dt=self.network.dt,
+                                    num_group=50
                                     )
+
         # desired_vel =self.encoding(self.planner.vel_output(self.step_now),
         #                             self.network.layers["GR_Joint_layer"].n,
         #                             self.encoding_time,
@@ -465,10 +467,6 @@ class MusclePipeline(BasePipeline):
         #                             )
 
         self.Sender()
-
-        # get pos and vel from Info_network and
-        # [pos,vel] -> error -> current -> spike(input)
-        # self.error = self.kx * (desired_pos - self.Info_network["pos"]) + self.kv * (desired_vel - self.Info_network["vel"])
         error = self.kx * (self.planner.pos_output(self.step_now) - self.Info_network["pos"])
 
         curr, curr_anti = Error2IO_Current(error)

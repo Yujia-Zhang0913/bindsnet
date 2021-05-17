@@ -1,16 +1,17 @@
-from typing import Optional,Union
+from typing import Optional, Union
 
 import torch
 import numpy as np
 import math
 
+
 def single(
-    datum: torch.Tensor,
-    time: int,
-    dt: float = 1.0,
-    sparsity: float = 0.5,
-    device="cpu",
-    **kwargs
+        datum: torch.Tensor,
+        time: int,
+        dt: float = 1.0,
+        sparsity: float = 0.5,
+        device="cpu",
+        **kwargs
 ) -> torch.Tensor:
     # language=rst
     """
@@ -50,11 +51,11 @@ def repeat(datum: torch.Tensor, time: int, dt: float = 1.0, **kwargs) -> torch.T
 
 
 def bernoulli(
-    datum: torch.Tensor,
-    time: Optional[int] = None,
-    dt: float = 1.0,
-    device="cpu",
-    **kwargs
+        datum: torch.Tensor,
+        time: Optional[int] = None,
+        dt: float = 1.0,
+        device="cpu",
+        **kwargs
 ) -> torch.Tensor:
     # language=rst
     """
@@ -97,12 +98,12 @@ def bernoulli(
 
 
 def poisson(
-    datum: torch.Tensor,
-    time: int,
-    dt: float = 1.0,
-    device="cpu",
-    approx=False,
-    **kwargs
+        datum: torch.Tensor,
+        time: int,
+        dt: float = 1.0,
+        device="cpu",
+        approx=False,
+        **kwargs
 ) -> torch.Tensor:
     # language=rst
     """
@@ -157,7 +158,7 @@ def poisson(
 
 
 def rank_order(
-    datum: torch.Tensor, time: int, dt: float = 1.0, **kwargs
+        datum: torch.Tensor, time: int, dt: float = 1.0, **kwargs
 ) -> torch.Tensor:
     # language=rst
     """
@@ -192,14 +193,61 @@ def rank_order(
 
 
 def bernoulli_RBF(
-    datum: Optional[Union[float, torch.Tensor]],                # [n_1]
-    neural_num: int,                    # GR输入细胞的个数
-    time: Optional[int] = None,         # 编码的真实时间长度
-    dt: float = 1.0,                    # 网络中仿真的长度
-    device="cpu",# RESULT: shape [time/dt,neural_num]
-    max=30,
-    **kwargs
+        datum: list,  # [n_1]
+        neural_num: int,
+        num_group: int = 10,  # GR输入细胞的个数
+        time: Optional[int] = None,  # 编码的真实时间长度
+        dt: float = 1.0,  # 网络中仿真的长度
+        device="cpu",  # RESULT: shape [time/dt,neural_num]
+        max=30,
+        **kwargs
 ) -> torch.Tensor:
+    # language=rst
+    """
+    Generates Bernoulli-distributed spike trains based on input intensity. Inputs must
+    be non-negative. Spikes correspond to successful Bernoulli trials, with success
+    probability equal to (normalized in [0, 1]) input value.
+
+    MAKE SURE THE INPUT [0,1]
+    :param datum: Tensor of shape ``[n_1, ..., n_k]``.
+    :param time: Length of Bernoulli spike train per input variable.
+    :param num_group: the number of the group
+    :param dt: Simulation time step.
+    :param neural_num: num of neural_num
+    :param device: "CPU" "GPU"
+    :return: Tensor of shape ``[time, n_1, ..., n_k]`` of Bernoulli-distributed spikes.
+
+    Keyword arguments:
+
+    :param float max_prob: Maximum probability of spike per Bernoulli trial.
+    """
+    # Setting kwargs.
+    # Setting kwargs.
+    #  Change time from real to the network
+    Time_network = int(time / dt)
+    RATE = []
+    for t in range(Time_network):
+        for i in range(int(num_group)):
+            for n in range(int(neural_num/num_group)):
+                RATE.append(datum[i])
+    # Get the rate matrix of (time/dt, neural_num)
+    Final_Input = torch.Tensor(RATE)
+
+    Final_Input = Final_Input.resize(Time_network, neural_num)  # Get the rate of (time/dt, num)
+    shape, size = Final_Input.shape, Final_Input.numel()
+
+    # Make spike data from Bernoulli sampling.
+    spikes = torch.bernoulli(Final_Input).to(device)
+    spikes = spikes.view(*shape)
+    return spikes.byte()
+
+
+def bernoulli_pre(
+        datum: float,  # [n_1]
+        num_group: int = 10,  # GR输入细胞的个数
+        input_max=30,
+        **kwargs
+) -> list:
     # language=rst
     """
     Generates Bernoulli-distributed spike trains based on input intensity. Inputs must
@@ -218,53 +266,35 @@ def bernoulli_RBF(
 
     :param float max_prob: Maximum probability of spike per Bernoulli trial.
     """
-    # Setting kwargs.
-    # Setting kwargs.
-    if isinstance(datum, float):
-        datum = torch.Tensor([datum])
-    max_prob = kwargs.get("max_prob", 1.0)
-    assert 0 <= max_prob <= 1, "Maximum firing probability must be in range [0, 1]"
-    assert (datum >= 0).all(), "Inputs must be non-negative"
-    datum = datum/max
-    if datum>1:
-        datum=1
-    #Create RBF 10Inputs
-    RBF = []                               #range from the min of input to the max
-    for i in range(neural_num):            #Adjust the number of the ner
-        RBF.append(i / neural_num)
+    Input_cur = datum
+    datum = torch.Tensor([Input_cur])
 
-    #  Change time from real to the network
-    if time is not None:
-        Time_network = int(time / dt)
+    # Normalize
+    datum /= input_max
+    if datum > 1:
+        datum = torch.Tensor([1])
 
-    # Get the rate matrix of (time/dt, neural_num)
-    RATE = []
-    omiga = 1/neural_num/3  # 1.5 omiga equals margin
-    for t in range(Time_network):
-        for i in RBF:
-            delta_X = datum.data - i
-            rate = math.exp(-(delta_X * delta_X) / 2/omiga**2) # TODO make some changes
-            RATE.append(rate)
+    # Create RBF 10Inputs
+    RBF = []  # range from the min of input to the max
+    for i in range(num_group):  # Adjust the number of the ner
+        RBF.append(i / 10)
+    Input_RATE = []
+    omega = 1 / num_group / 3  # 方差
 
-    Final_Input = torch.Tensor(RATE)
+    for i in RBF:
+        delta_X = datum.data - i
+        rate = math.exp(-(delta_X * delta_X) / 2 / omega ** 2)
+        Input_RATE.append(rate)
+    return Input_RATE
 
-    Final_Input = Final_Input.resize(Time_network, neural_num)        #Get the rate of (time/dt, num)
-    shape, size = Final_Input.shape, Final_Input.numel()
-
-    # Make spike data from Bernoulli sampling.
-    spikes = torch.bernoulli(max_prob * Final_Input).to(device)
-    spikes = spikes.view(*shape)
-    torch.set_printoptions(precision=None, threshold=6000, edgeitems=None, linewidth=None, profile=None, sci_mode=None)
-    print(spikes.byte())
-    return spikes.byte()
 
 def poisson_IO(
-    datum: Optional[Union[float, torch.Tensor]],
-    time: int,
-    dt: float = 1.0,
-    device="cpu",
-    approx=False,
-    **kwargs
+        datum: Optional[Union[float, torch.Tensor]],
+        time: int,
+        dt: float = 1.0,
+        device="cpu",
+        approx=False,
+        **kwargs
 ) -> torch.Tensor:
     # language=rst
     """
@@ -309,7 +339,7 @@ def poisson_IO(
 
         ner = 8
 
-        intervals = dist.sample(sample_shape=torch.Size([ner]))    #32 refers to the num of input ner
+        intervals = dist.sample(sample_shape=torch.Size([ner]))  # 32 refers to the num of input ner
         intervals[:, datum != 0] += (intervals[:, datum != 0] == 0).float()
         intervals = intervals.t()
         # Calculate spike times by cumulatively summing over time dimension.
@@ -323,17 +353,17 @@ def poisson_IO(
 
         return spikes.view(time, ner)
 
-def IO_Current2spikes(
-    Current: torch.Tensor,
-    neural_num: int,
-    time: int,
-    dt: float = 1.0,
-    device="cpu",
-    approx=False,
-    visual=False,
-    **kwargs
-) -> torch.Tensor:
 
+def IO_Current2spikes(
+        Current: torch.Tensor,
+        neural_num: int,
+        time: int,
+        dt: float = 1.0,
+        device="cpu",
+        approx=False,
+        visual=False,
+        **kwargs
+) -> torch.Tensor:
     # language=rst
     """
     Generates Bernoulli-distributed spike trains based on input intensity. Inputs must
@@ -382,47 +412,41 @@ def IO_Current2spikes(
         Final_spike = torch.cat((spike, Final_spike), 0)
     Final_spike = Final_spike.resize(Time_network, neural_num)
     if visual:
-        print("-"*10+"Current2Spike"+"-"*10)
+        print("-" * 10 + "Current2Spike" + "-" * 10)
         print(Final_spike.byte())
     return Final_spike.byte()
 
 
 def Decode_Output(
-    datum: torch.Tensor,
-    neural_num: int,
-    time: int,
-    dt: float = 1.0,
-    bound: float = 10.0,
-    device="cpu",
-    approx=False,
-    visual=False,
-    **kwargs
+        datum: torch.Tensor,
+        neural_num: int,
+        time: int,
+        dt: float = 1.0,
+        bound: float = 10.0,
+        device="cpu",
+        approx=False,
+        visual=False,
+        **kwargs
 ) -> torch.Tensor:
-
     datum = torch.squeeze(datum, 1)
     RATE = torch.zeros(neural_num)
     Output = torch.zeros(neural_num)
     Weight = torch.zeros(neural_num)
 
     times = torch.sum(datum, 0)
-    RATE = times / (time/dt)
+    RATE = times / (time / dt)
 
-    RATE = torch.sigmoid(RATE)   #输出层细胞，增强非线性
+    RATE = torch.sigmoid(RATE)  # 输出层细胞，增强非线性
 
     for i in range(neural_num):
-        Output[i] = RATE[i] * (i*bound/neural_num)
-        Weight[i] = i*bound/neural_num
+        Output[i] = RATE[i] * (i * bound / neural_num)
+        Weight[i] = i * bound / neural_num
 
     Weight = torch.sum(Weight)
     Output = torch.sum(Output)
 
-    Output = bound * Output /torch.sum(Weight)      #控制范围
-    if visual: # TODO
-        print("-"*10+"Decode"+"-"*10)
+    Output = bound * Output / torch.sum(Weight)  # 控制范围
+    if visual:  # TODO
+        print("-" * 10 + "Decode" + "-" * 10)
         pass
     return Output
-
-
-
-
-

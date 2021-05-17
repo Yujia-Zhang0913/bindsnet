@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes, LIF_Train
-from bindsnet.network.topology import Connection
+from bindsnet.network.topology import Connection,Group_Connection
 from bindsnet.network.monitors import Monitor, Global_Monitor, Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
@@ -18,7 +18,7 @@ from bindsnet.environment.environment import MuscleEnvironment
 network = Network(dt=1)
 
 # nodes
-MF_layer = Input(n=100,traces=True)
+MF_layer = Input(n=400,traces=True) # 50 group each 8 
 GR_Joint_layer = LIFNodes(traces=True, refrac=0, shape=(5, 200))
 PK = LIF_Train(n=32, traces=True, refrac=0)
 PK_Anti = LIF_Train(n=32, traces=True, refrac=0)
@@ -27,10 +27,10 @@ IO_Anti = Input(n=32, traces=True, is_IO=True, refrac=0)
 DCN = LIFNodes(n=100, traces=True, refrac=0)
 DCN_Anti = LIFNodes(n=100, trace=True, refrac=0)
 
-MF_fiber = Connection(
+MF_fiber = Group_Connection(
     source=MF_layer,
     target=GR_Joint_layer,
-    w=5 + torch.zeros(MF_layer.n, GR_Joint_layer.n),
+    w=1
 )
 
 # add Connection
