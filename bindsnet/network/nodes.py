@@ -14,16 +14,16 @@ class Nodes(torch.nn.Module):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,  # 完成 spike之后指数衰减的时间常数
-        trace_scale: Union[float, torch.Tensor] = 1.0,# add的幅度
-        sum_input: bool = False,
-        learning: bool = True,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,  # 完成 spike之后指数衰减的时间常数
+            trace_scale: Union[float, torch.Tensor] = 1.0,  # add的幅度
+            sum_input: bool = False,
+            learning: bool = True,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -41,7 +41,7 @@ class Nodes(torch.nn.Module):
         super().__init__()
 
         assert (
-            n is not None or shape is not None
+                n is not None or shape is not None
         ), "Must provide either no. of neurons or shape of layer"
 
         if n is None:
@@ -161,10 +161,6 @@ class Nodes(torch.nn.Module):
         :return: self as specified in `torch.nn.Module`
         """
 
-
-
-
-
         self.learning = mode
         return super().train(mode)
 
@@ -183,64 +179,6 @@ class Input(Nodes, AbstractInput):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        **kwargs,
-    ) -> None:
-        # language=rst
-        """
-        Instantiates a layer of input neurons.
-
-        :param n: The number of neurons in the layer.
-        :param shape: The dimensionality of the layer.
-        :param traces: Whether to record decaying spike traces.
-        :param traces_additive: Whether to record spike traces additively.
-        :param tc_trace: Time constant of spike trace decay.
-        :param trace_scale: Scaling factor for spike trace.
-        :param sum_input: Whether to sum all inputs.
-        """
-        super().__init__(
-            n=n,
-            shape=shape,
-            traces=traces,
-            traces_additive=traces_additive,
-            tc_trace=tc_trace,
-            trace_scale=trace_scale,
-            sum_input=sum_input,
-        )
-
-    def forward(self, x: torch.Tensor) -> None:
-        # language=rst
-        """
-        On each simulation step, set the spikes of the population equal to the inputs.
-
-        :param x: Inputs to the layer.
-        """
-        # Set spike occurrences to input values.
-        self.s = x
-
-        super().forward(x)
-
-    def reset_state_variables(self) -> None:
-        # language=rst
-        """
-        Resets relevant state variables.
-        """
-        super().reset_state_variables()
-
-class IO_Input(Nodes, AbstractInput):
-    # language=rst
-    """
-    Layer of nodes with user-specified spiking behavior.
-    """
-
-    def __init__(
             self,
             n: Optional[int] = None,
             shape: Optional[Iterable[int]] = None,
@@ -249,6 +187,7 @@ class IO_Input(Nodes, AbstractInput):
             tc_trace: Union[float, torch.Tensor] = 20.0,
             trace_scale: Union[float, torch.Tensor] = 1.0,
             sum_input: bool = False,
+            is_IO: bool = False,
             **kwargs,
     ) -> None:
         # language=rst
@@ -263,6 +202,7 @@ class IO_Input(Nodes, AbstractInput):
         :param trace_scale: Scaling factor for spike trace.
         :param sum_input: Whether to sum all inputs.
         """
+        self.is_IO = is_IO
         super().__init__(
             n=n,
             shape=shape,
@@ -273,7 +213,6 @@ class IO_Input(Nodes, AbstractInput):
             sum_input=sum_input,
         )
 
-
     def forward(self, x: torch.Tensor) -> None:
         # language=rst
         """
@@ -282,9 +221,12 @@ class IO_Input(Nodes, AbstractInput):
         :param x: Inputs to the layer.
         """
         # Set spike occurrences to input values.
-        eps = torch.rand(self.shape)
-        self.s.masked_fill_((x-eps)>0,1)
-        # print(self.s)
+        if self.is_IO is False:
+            self.s = x
+        else:
+            self.s = torch.zeros_like(x)
+            self.IO_spike = x
+
         super().forward(x)
 
     def reset_state_variables(self) -> None:
@@ -294,7 +236,7 @@ class IO_Input(Nodes, AbstractInput):
         """
         super().reset_state_variables()
 
-class LIF_Train(Nodes,AbstractInput):
+class LIF_Train(Nodes, AbstractInput):
     # language=rst
     """
     Layer of `leaky integrate-and-fire (LIF) neurons
@@ -408,7 +350,6 @@ class LIF_Train(Nodes,AbstractInput):
         self.IO_s  # 这句话没有意义，仅仅表示该神经元存在一个记录IO_s的变量。
         # self.IO_s 在IO-PK connection update 中写入, 在 GR-PK connection uodate 中使用并清零
 
-
         super().forward(x)  # 计算 trace
 
     def reset_state_variables(self) -> None:
@@ -442,6 +383,7 @@ class LIF_Train(Nodes,AbstractInput):
         self.refrac_count = torch.zeros_like(self.v, device=self.refrac_count.device)
         self.IO_s = torch.zeros_like(self.v)
 
+
 class McCullochPitts(Nodes):
     # language=rst
     """
@@ -450,16 +392,16 @@ class McCullochPitts(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = 1.0,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = 1.0,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -526,19 +468,19 @@ class IFNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        reset: Union[float, torch.Tensor] = -65.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -637,21 +579,21 @@ class LIFNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        rest: Union[float, torch.Tensor] = -65.0,
-        reset: Union[float, torch.Tensor] = -65.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            rest: Union[float, torch.Tensor] = -65.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -723,8 +665,7 @@ class LIFNodes(Nodes):
         self.v = self.decay * (self.v - self.rest) + self.rest
 
         # Integrate inputs.
-        x.masked_fill_(self.refrac_count > 0, 0.0)   # 未 跳出不应期的输入 视为没有
-
+        x.masked_fill_(self.refrac_count > 0, 0.0)  # 未 跳出不应期的输入 视为没有
 
         # Decrement refractory counters.
         self.refrac_count -= self.dt  # 不应期counter减少
@@ -732,14 +673,14 @@ class LIFNodes(Nodes):
         self.v += x  # interlaced    在原先恢复的电位基础上再加一个电压（指的应该是局部电位——具有可加性的电位）
 
         # Check for spiking neurons.
-        self.s = self.v >= self.thresh   # 得到bool的spike
+        self.s = self.v >= self.thresh  # 得到bool的spike
 
         # Refractoriness and voltage reset.
-        self.refrac_count.masked_fill_(self.s, self.refrac)    # 重置不应期时间
-        self.v.masked_fill_(self.s, self.reset)                # 电压恢复到静息电位
+        self.refrac_count.masked_fill_(self.s, self.refrac)  # 重置不应期时间
+        self.v.masked_fill_(self.s, self.reset)  # 电压恢复到静息电位
 
         # Voltage clipping to lower bound.
-        if self.lbound is not None:                            #电压最低值
+        if self.lbound is not None:  # 电压最低值
             self.v.masked_fill_(self.v < self.lbound, self.lbound)
 
         super().forward(x)  # 计算 trace
@@ -778,18 +719,18 @@ class LIFNodes(Nodes):
 class BoostedLIFNodes(Nodes):
     # Same as LIFNodes, faster: no rest, no reset, no lbound
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = 13.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = 13.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -903,22 +844,22 @@ class CurrentLIFNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        rest: Union[float, torch.Tensor] = -65.0,
-        reset: Union[float, torch.Tensor] = -65.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        tc_i_decay: Union[float, torch.Tensor] = 2.0,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            rest: Union[float, torch.Tensor] = -65.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            tc_i_decay: Union[float, torch.Tensor] = 2.0,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -1050,23 +991,23 @@ class AdaptiveLIFNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        rest: Union[float, torch.Tensor] = -65.0,
-        reset: Union[float, torch.Tensor] = -65.0,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        theta_plus: Union[float, torch.Tensor] = 0.05,
-        tc_theta_decay: Union[float, torch.Tensor] = 1e7,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            rest: Union[float, torch.Tensor] = -65.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            theta_plus: Union[float, torch.Tensor] = 0.05,
+            tc_theta_decay: Union[float, torch.Tensor] = 1e7,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -1202,24 +1143,24 @@ class DiehlAndCookNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        rest: Union[float, torch.Tensor] = -65.0,
-        reset: Union[float, torch.Tensor] = -65.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        theta_plus: Union[float, torch.Tensor] = 0.05,
-        tc_theta_decay: Union[float, torch.Tensor] = 1e7,
-        lbound: float = None,
-        one_spike: bool = True,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            rest: Union[float, torch.Tensor] = -65.0,
+            reset: Union[float, torch.Tensor] = -65.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            theta_plus: Union[float, torch.Tensor] = 0.05,
+            tc_theta_decay: Union[float, torch.Tensor] = 1e7,
+            lbound: float = None,
+            one_spike: bool = True,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -1367,19 +1308,19 @@ class IzhikevichNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        excitatory: float = 1,
-        thresh: Union[float, torch.Tensor] = 45.0,
-        rest: Union[float, torch.Tensor] = -65.0,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            excitatory: float = 1,
+            thresh: Union[float, torch.Tensor] = 45.0,
+            rest: Union[float, torch.Tensor] = -65.0,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -1539,27 +1480,27 @@ class CSRMNodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        rest: Union[float, torch.Tensor] = -65.0,
-        thresh: Union[float, torch.Tensor] = -52.0,
-        responseKernel: str = "ExponentialKernel",
-        refractoryKernel: str = "EtaKernel",
-        tau: Union[float, torch.Tensor] = 1,
-        res_window_size: Union[float, torch.Tensor] = 20,
-        ref_window_size: Union[float, torch.Tensor] = 10,
-        reset_const: Union[float, torch.Tensor] = 50,
-        tc_decay: Union[float, torch.Tensor] = 100.0,
-        theta_plus: Union[float, torch.Tensor] = 0.05,
-        tc_theta_decay: Union[float, torch.Tensor] = 1e7,
-        lbound: float = None,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            rest: Union[float, torch.Tensor] = -65.0,
+            thresh: Union[float, torch.Tensor] = -52.0,
+            responseKernel: str = "ExponentialKernel",
+            refractoryKernel: str = "EtaKernel",
+            tau: Union[float, torch.Tensor] = 1,
+            res_window_size: Union[float, torch.Tensor] = 20,
+            ref_window_size: Union[float, torch.Tensor] = 10,
+            reset_const: Union[float, torch.Tensor] = 50,
+            tc_decay: Union[float, torch.Tensor] = 100.0,
+            theta_plus: Union[float, torch.Tensor] = 0.05,
+            tc_theta_decay: Union[float, torch.Tensor] = 1e7,
+            lbound: float = None,
+            **kwargs,
     ) -> None:
         # language=rst
         """
@@ -1775,24 +1716,24 @@ class SRM0Nodes(Nodes):
     """
 
     def __init__(
-        self,
-        n: Optional[int] = None,
-        shape: Optional[Iterable[int]] = None,
-        traces: bool = False,
-        traces_additive: bool = False,
-        tc_trace: Union[float, torch.Tensor] = 20.0,
-        trace_scale: Union[float, torch.Tensor] = 1.0,
-        sum_input: bool = False,
-        thresh: Union[float, torch.Tensor] = -50.0,
-        rest: Union[float, torch.Tensor] = -70.0,
-        reset: Union[float, torch.Tensor] = -70.0,
-        refrac: Union[int, torch.Tensor] = 5,
-        tc_decay: Union[float, torch.Tensor] = 10.0,
-        lbound: float = None,
-        eps_0: Union[float, torch.Tensor] = 1.0,
-        rho_0: Union[float, torch.Tensor] = 1.0,
-        d_thresh: Union[float, torch.Tensor] = 5.0,
-        **kwargs,
+            self,
+            n: Optional[int] = None,
+            shape: Optional[Iterable[int]] = None,
+            traces: bool = False,
+            traces_additive: bool = False,
+            tc_trace: Union[float, torch.Tensor] = 20.0,
+            trace_scale: Union[float, torch.Tensor] = 1.0,
+            sum_input: bool = False,
+            thresh: Union[float, torch.Tensor] = -50.0,
+            rest: Union[float, torch.Tensor] = -70.0,
+            reset: Union[float, torch.Tensor] = -70.0,
+            refrac: Union[int, torch.Tensor] = 5,
+            tc_decay: Union[float, torch.Tensor] = 10.0,
+            lbound: float = None,
+            eps_0: Union[float, torch.Tensor] = 1.0,
+            rho_0: Union[float, torch.Tensor] = 1.0,
+            d_thresh: Union[float, torch.Tensor] = 5.0,
+            **kwargs,
     ) -> None:
         # language=rst
         """

@@ -11,7 +11,7 @@ from ..environment import Environment, MuscleEnvironment
 from ..network import Network
 from ..network.nodes import AbstractInput
 from ..network.monitors import Monitor, Global_Monitor, Our_Monitor
-from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output,bernoulli
+from bindsnet.encoding import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output, bernoulli
 from bindsnet.utils import Error2IO_Current
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 import matplotlib.pyplot as plt
@@ -454,7 +454,7 @@ class MusclePipeline(BasePipeline):
         # encode desired joint position
         # TODO only pos no vel
         desired_pos = self.encoding(self.planner.pos_output(self.step_now),
-                                    self.network.layers["GR_Joint_layer"].n,
+                                    self.network.layers["MF_layer"].n,
                                     self.encoding_time,
                                     self.network.dt
                                     )
@@ -487,7 +487,7 @@ class MusclePipeline(BasePipeline):
                                           )
         inputs = {
             "IO": IO_input,
-            "GR_Joint_layer": desired_pos,
+            "MF_layer": desired_pos,
             "IO_Anti": IO_anti_input
         }
         # run the network and write into the Info_network
@@ -580,15 +580,17 @@ class MusclePipeline(BasePipeline):
 
         :param batch: default 1
         """
-        print("-"*10+"Error and input"+"-"*10)
+        print("-" * 10 + "Error and input" + "-" * 10)
         print("error: {} = Kx * desire_pos: {} - real_pos: {}".format(self.REC_DICT["error"],
                                                                       self.planner.pos_output(self.step_now - 1),
                                                                       self.Info_network["pos"]))
         print("Error to Current: curr: {}   curr_anti:{}".format(self.REC_DICT["curr"], self.REC_DICT["curr_anti"]))
         print("Curr to spikes")
-        print("-"*10+"Net running"+"-"*10)
-        print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
-        print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
-        print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"], self.Info_network["anti_network"]))
+        print("-" * 10 + "Net running" + "-" * 10)
+        print("Weight:{}".format(self.network.connections[("MF_layer", "GR_Joint_layer")].w.shape))
+        # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
+        # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
+        print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"],
+                                                                self.Info_network["anti_network"]))
 
         pass
