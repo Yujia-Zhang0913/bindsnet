@@ -452,12 +452,12 @@ class MusclePipeline(BasePipeline):
         """
         # encode desired joint position
         # TODO only pos no vel
-        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now),num_group=50)
+        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now),num_group=10)
         desired_pos = bernoulli_RBF(datum=Input_RATE,
                                     neural_num=self.network.layers["MF_layer"].n,
                                     time=self.encoding_time,
                                     dt=self.network.dt,
-                                    num_group=50
+                                    num_group=10
                                     )
 
         # desired_vel =self.encoding(self.planner.vel_output(self.step_now),
@@ -527,12 +527,19 @@ class MusclePipeline(BasePipeline):
         if self.step_now is 0:
             self.Info_network["network"] = 0
             self.Info_network["anti_network"] = 0
+            DCN = self.network.monitors["DCN"].get("s")
+            DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
+
         else:
-            PK = self.network.monitors["PK"].get("s")
-            Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
-            PK_Anti = self.network.monitors["PK_Anti"].get("s")
-            Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt,
-                                        1)
+            DCN = self.network.monitors["DCN"].get("s")
+            Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, bound=10)
+            DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
+            Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.network.dt, bound=10)
+            # PK = self.network.monitors["PK"].get("s")
+            # Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
+            # PK_Anti = self.network.monitors["PK_Anti"].get("s")
+            # Output_Anti = Decode_Output(PK_Anti, self.network.layers["PK_Anti"].n, self.encoding_time, self.network.dt,
+            #                             1)
             self.Info_network["network"] = float(Output)
             self.Info_network["anti_network"] = float(Output_Anti)
 
@@ -587,7 +594,7 @@ class MusclePipeline(BasePipeline):
         print("Error to Current: curr: {}   curr_anti:{}".format(self.REC_DICT["curr"], self.REC_DICT["curr_anti"]))
         print("Curr to spikes")
         print("-" * 10 + "Net running" + "-" * 10)
-        print("Weight:{}".format(self.network.connections[("MF_layer", "GR_Joint_layer")].w))
+        # print("Weight:{}".format(self.network.connections[("GR_Joint_layer", "PK")].w))
         # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
         # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
         print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"],

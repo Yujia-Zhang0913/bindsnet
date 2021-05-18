@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes, LIF_Train
-from bindsnet.network.topology import Connection,Group_Connection
+from bindsnet.network.topology import Connection, Group_Connection
 from bindsnet.network.monitors import Monitor, Global_Monitor, Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
@@ -18,8 +18,8 @@ from bindsnet.environment.environment import MuscleEnvironment
 network = Network(dt=1)
 
 # nodes
-MF_layer = Input(n=400,traces=True) # 50 group each 8
-GR_Joint_layer = LIFNodes(n=1000,traces=True, refrac=0)
+MF_layer = Input(n=80, traces=True, refrac=0)  # 50 group each 8  10 g 8
+GR_Joint_layer = LIFNodes(n=100, traces=True, refrac=0)
 PK = LIF_Train(n=80, traces=True, refrac=0)
 PK_Anti = LIF_Train(n=80, traces=True, refrac=0)
 IO = Input(n=80, traces=True, is_IO=True, refrac=0)
@@ -32,65 +32,75 @@ DCN_Anti = LIFNodes(n=80, trace=True, refrac=0)
 MF_fiber = Group_Connection(
     source=MF_layer,
     target=GR_Joint_layer,
-    w=0.2
+    norm=5
+
 )
 
 # add Connection
 Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
-    wmin=0,
-    wmax=1,
+    wmin=1,
+    wmax=5,
     update_rule=STDP,
     nu=[0.1, 0.1],
-    w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
-    norm=0.5 * GR_Joint_layer.n
+    w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
+    norm=1 * GR_Joint_layer.n
 )
 Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
-    wmin=0,
-    wmax=1,
+    wmin=1,
+    wmax=5,
     nu=[0.1, 0.1],
     update_rule=STDP,
-    w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
-    norm=0.5 * GR_Joint_layer.n
+    w=1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
+    norm=1 * GR_Joint_layer.n
 )
 
 Climbingfiber = Connection(
     source=IO,
     target=PK,
     update_rule=IO_Record,
+
 )
 
 Climbingfiber_Anti = Connection(
     source=IO_Anti,
     target=PK_Anti,
     update_rule=IO_Record,
+
+
 )
 
 PK_DCN = Connection(
     source=PK,
     target=DCN,
-    w=-0.1 * torch.ones(PK.n, DCN.n)
+    # w=-0.1 * torch.ones(PK.n, DCN.n)
+    norm=-10
 )
 
 PK_DCN_Anti = Connection(
     source=PK_Anti,
     target=DCN_Anti,
-    w=-0.1 * torch.ones(PK_Anti.n, DCN_Anti.n)
+    # w=-0.1 * torch.ones(PK_Anti.n, DCN_Anti.n)
+    norm=-10
 )
 
 IO_DCN = Connection(
     source=IO_new,
     target=DCN,
-    w=0.1 * torch.ones(IO_new.n, DCN.n)
+    # w=0.1 * torch.ones(IO_new.n, DCN.n)
+    norm=10
+
 )
 
 IO_DCN_Anti = Connection(
     source=IO_Anti_new,
     target=DCN_Anti,
-    w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
+    # w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
+    norm=10
+
 )
 
 network.add_layer(layer=MF_layer, name="MF_layer")
@@ -101,8 +111,8 @@ network.add_layer(layer=IO, name="IO")
 network.add_layer(layer=IO_Anti, name="IO_Anti")
 network.add_layer(layer=DCN, name="DCN")
 network.add_layer(layer=DCN_Anti, name="DCN_Anti")
-network.add_layer(layer=IO_new,name="IO_new")
-network.add_layer(layer=IO_Anti_new,name="IO_Anti_new")
+network.add_layer(layer=IO_new, name="IO_new")
+network.add_layer(layer=IO_Anti_new, name="IO_Anti_new")
 
 network.add_connection(connection=MF_fiber, source="MF_layer", target="GR_Joint_layer")
 network.add_connection(connection=Climbingfiber, source="IO", target="PK")
@@ -140,7 +150,7 @@ IO_monitor = Monitor(
     state_vars=("s")
 )
 IO_Anti_monitor = Monitor(
-    obj = IO_Anti_new,
+    obj=IO_Anti_new,
     state_vars=("s")
 )
 

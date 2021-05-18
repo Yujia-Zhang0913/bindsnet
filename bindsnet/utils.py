@@ -222,7 +222,7 @@ def Error2IO_Current(
         datum: Optional[Union[float, Tensor]],
         max_current: float = 0.8,
         base_current: float = 0.15,
-        error_max: float = 10,
+        error_max: float = 1,
         # TODO  how to normalize and whether to add P_max parameter
         P_max:float = 10
 ) -> list:
@@ -242,7 +242,7 @@ def Error2IO_Current(
 
     """
     if isinstance(datum, float):
-        datum = torch.Tensor([datum])
+        datum = torch.Tensor([datum/error_max])
     if datum.data > 0:
         # TODO 电流值数量级的把控--计算公式是否需要修改
         # 公式是想当然的 但是在数值上比较合理  --lys

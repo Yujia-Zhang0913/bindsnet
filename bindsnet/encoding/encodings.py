@@ -246,6 +246,7 @@ def bernoulli_pre(
         datum: float,  # [n_1]
         num_group: int = 10,  # GR输入细胞的个数
         input_max=30,
+        max_pro =0.6,
         **kwargs
 ) -> list:
     # language=rst
@@ -283,7 +284,7 @@ def bernoulli_pre(
 
     for i in RBF:
         delta_X = datum.data - i
-        rate = math.exp(-(delta_X * delta_X) / 2 / omega ** 2)
+        rate = max_pro*math.exp(-(delta_X * delta_X) / 2 / omega ** 2)
         Input_RATE.append(rate)
     return Input_RATE
 
@@ -429,24 +430,19 @@ def Decode_Output(
         **kwargs
 ) -> torch.Tensor:
     datum = torch.squeeze(datum, 1)
-    RATE = torch.zeros(neural_num)
-    Output = torch.zeros(neural_num)
-    Weight = torch.zeros(neural_num)
+    # RATE = torch.zeros(neural_num)
+    # Output = torch.zeros(neural_num)
+    # Weight = torch.zeros(neural_num)
 
     times = torch.sum(datum, 0)
     RATE = times / (time / dt)
 
-    RATE = torch.sigmoid(RATE)  # 输出层细胞，增强非线性
+    # RATE = torch.sigmoid(RATE)  # 输出层细胞，增强非线性
+    Output_01 = torch.sum(RATE)
+    Output_01 /= neural_num
 
-    for i in range(neural_num):
-        Output[i] = RATE[i] * (i * bound / neural_num)
-        Weight[i] = i * bound / neural_num
-
-    Weight = torch.sum(Weight)
-    Output = torch.sum(Output)
-
-    Output = bound * Output / torch.sum(Weight)  # 控制范围
+    out = bound * Output_01
     if visual:  # TODO
         print("-" * 10 + "Decode" + "-" * 10)
         pass
-    return Output
+    return out

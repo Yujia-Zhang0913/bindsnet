@@ -1,6 +1,6 @@
 import time
 from typing import Tuple, Dict, Any
-
+import numpy as np
 import torch
 from torch._six import container_abcs, string_classes
 
@@ -151,9 +151,13 @@ class BasePipeline:
 
         :return: A dictionary containing all spike monitors from the network.
         """
+        torch.set_printoptions(threshold=np.inf)
+
         data = {}
         for l in self.network.layers:
             data[l] = self.network.monitors[f"{l}_spikes"].get("s")
+            # print("{}:{}".format(l,data[l]))
+
         return data
 
     def get_voltage_data(
