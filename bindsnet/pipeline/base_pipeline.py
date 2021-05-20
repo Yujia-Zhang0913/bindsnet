@@ -119,7 +119,9 @@ class BasePipeline:
             anything. Passed to plotting to accommodate this.
         """
         self.step_count += 1
-
+        if self.step_count is 1:
+            for c in self.network.connections:
+                self.network.connections[c].normalize()
         batch = recursive_to(batch, self.device)
         step_out = self.step_(batch, **kwargs)
 

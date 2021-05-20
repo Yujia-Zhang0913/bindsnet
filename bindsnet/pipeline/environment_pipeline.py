@@ -301,7 +301,7 @@ class EnvironmentPipeline(BasePipeline):
                 k: self.encoding(obs, self.time, device=self.device)
                 for k in self.inputs
             }
-            print(inputs)  # TODO
+            print(inputs)
 
         # Run the network on the spike train-encoded inputs.
         self.network.run(inputs=inputs, time=self.time, reward=reward, **kwargs)
@@ -477,11 +477,13 @@ class MusclePipeline(BasePipeline):
         IO_input = IO_Current2spikes(curr,
                                      neural_num=self.network.layers["IO"].n,
                                      time=self.encoding_time,
-                                     dt=self.network.dt)
+                                     dt=self.network.dt,
+                                     max_prob=1)
         IO_anti_input = IO_Current2spikes(curr_anti,
                                           neural_num=self.network.layers["IO"].n,
                                           time=self.encoding_time,
-                                          dt=self.network.dt
+                                          dt=self.network.dt,
+                                          max_prob=1
                                           )
         inputs = {
             "IO": IO_input,

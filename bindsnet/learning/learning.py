@@ -337,7 +337,10 @@ class STDP(LearningRule):
 
         # clear all spike record for target.IO_s:
         self.target.IO_s.masked_fill_(self.target.IO_s != 0, 0)
-
+        if self.connection.norm is not None:  # norm right now
+            w_abs_sum = self.connection.w.abs().sum(0).unsqueeze(0)
+            w_abs_sum[w_abs_sum == 0] = 1.0
+            self.connection.w *= self.connection.norm / w_abs_sum
         super().update()
 
 
@@ -390,7 +393,6 @@ class IO_Record(LearningRule):
         class.
         """
         self.target.IO_s = self.source.I.clone()  # 记录 是否有脉冲，一定要有clone
-        # TODO fucking bugs
 
         super().update()
 

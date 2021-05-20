@@ -106,7 +106,6 @@ class Network(torch.nn.Module):
         self.layers = {}       # 可以查看层
         self.connections = {}  # 可以查看连接
         self.monitors = {}     # 可以查看添加的监视器
-
         self.train(learning)
 
         if reward_fn is not None:
@@ -352,6 +351,8 @@ class Network(torch.nn.Module):
         # dt: 仿真步长，0.2s，1s内的输入是同一值
 
         # Simulate network activity for `time` timesteps.
+        # for c in self.connections:
+        #     self.connections[c].normalize()
         for t in range(timesteps):
             # Get input to all layers (synchronous mode).
             current_inputs = {}
@@ -413,8 +414,7 @@ class Network(torch.nn.Module):
                 self.monitors[m].record()
 
         # Re-normalize connections.
-        for c in self.connections:
-            self.connections[c].normalize()
+
 
     def reset_state_variables(self) -> None:
         # language=rst

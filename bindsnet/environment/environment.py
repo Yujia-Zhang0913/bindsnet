@@ -308,7 +308,7 @@ class MuscleEnvironment:
         print("-" * 10 + "Simulink start" + "-" * 10)
 
     def step(self,
-             real_time:float,
+             real_time: float,
              record_list: list,
              command_list: list) -> None:
         # language=rst
@@ -323,7 +323,7 @@ class MuscleEnvironment:
         if self.env_start_flag is True:
             self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
-            start_t  = self.eng.workspace['tout'][-1]
+            start_t = self.eng.workspace['tout'][-1]
             print("start_t: {}".format(start_t))
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
@@ -331,8 +331,7 @@ class MuscleEnvironment:
         t_now = self.eng.workspace['tout'][-1]
         t_now = self.eng.single(t_now)
 
-
-        while fabs(t_now-real_time) >= 0.05 and t_now < real_time:
+        while fabs(t_now - real_time) >= 0.05 and t_now < real_time:
             # self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
@@ -343,7 +342,6 @@ class MuscleEnvironment:
         self.Rec_eng_Info(record_list)
 
     def Rec_eng_Info(self, para_list: list) -> None:
-        # TODO due to the data structure of matlab workspace
         # language=rst
         """
             load desired eng variable from workspace to "Info_muscle"
@@ -358,7 +356,6 @@ class MuscleEnvironment:
                 self.Info_muscle[l] = self.eng.single(self.eng.workspace[l][-1][1])
 
     def Send_control(self, command_list: list):
-        # TODO due to the data structure of matlab workspace
         # language=rst
         """
             load desired eng variable from workspace to "Info_muscle"
@@ -368,10 +365,17 @@ class MuscleEnvironment:
         if len(command_list) is 0:
             print("You want to record empty!")
         else:
-            for c in command_list:
-                assert isinstance(c, str), "Invaild command key! Key must be string type"
-                assert self.Info_muscle.get(c) is not None, "No such key in Info_muscle"
-                self.eng.workspace[c] = self.Info_muscle[c]
+            if self.env_start_flag is False:
+                pass
+            # # for c in command_list:
+            # #     assert isinstance(c, str), "Invaild command key! Key must be string type"
+            # #     assert self.Info_muscle.get(c) is not None, "No such key in Info_muscle"
+            # self.eng.workspace["network"] = self.eng.double(self.Info_muscle["network"])
+            # self.eng.workspace["anti_network"] = self.eng.double(self.Info_muscle["anti_network"])
+            # # value = self.eng.double(self.Info_muscle["network"])
+            # # value_2 = self.eng.double(self.Info_muscle["anti_network"])
+                self.eng.set_param('actuator_2/network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["network"])),nargout=0)
+                self.eng.set_param('actuator_2/anti_network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["anti_network"])),nargout=0)
 
     def reset(self) -> None:
         # language=rst

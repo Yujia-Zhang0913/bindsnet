@@ -313,8 +313,7 @@ class MuscleEnvironment(Environment):
         self.Rec_eng_Info([record_list])
 
     def Rec_eng_Info(self,para_list:list)->None:
-        # TODO due to the data structure of matlab workspace
-        # TODO deal with non-exist para_name
+
         # language=rst
         """
             load desired eng variable from workspace to "Info_muscle"
@@ -328,7 +327,6 @@ class MuscleEnvironment(Environment):
                 self.Info_muscle[l] = self.eng.workspace[l]
 
     def Send_control(self,command_list:list):
-        # TODO due to the data structure of matlab workspace
         # language=rst
         """
             load desired eng variable from workspace to "Info_muscle"
@@ -347,7 +345,7 @@ class MuscleEnvironment(Environment):
         """
         reset eng and clear the Info dictionary
         """
-        self.eng.reset() #TODO matlab reload model
+        self.eng.reset()
         self.Info_muscle = {}
 
     def close(self) -> None:
@@ -551,7 +549,7 @@ class WholeEnvironment(Environment):
         # language=rst
         """
         """
-        # TODO how to calculate the planner
+
         self.Traj_Info = zeros(1, encoding_time)
 
     def Sender(self):

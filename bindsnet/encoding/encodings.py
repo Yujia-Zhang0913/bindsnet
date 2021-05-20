@@ -442,7 +442,7 @@ def Decode_Output(
     Output_01 /= neural_num
 
     out = bound * Output_01
-    if visual:  # TODO
+    if visual:
         print("-" * 10 + "Decode" + "-" * 10)
         pass
     return out

@@ -12,7 +12,7 @@ from bindsnet.utils import Error2IO_Current
 from bindsnet.encoding import poisson, bernoulli
 from bindsnet.pipeline.environment_pipeline import MusclePipeline, TrajectoryPlanner
 from bindsnet.environment.environment import MuscleEnvironment
-
+import matlab
 # time = 50
 # network
 network = Network(dt=1)
@@ -40,11 +40,11 @@ MF_fiber = Group_Connection(
 Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
-    wmin=1,
+    wmin=0,
     wmax=5,
     update_rule=STDP,
     nu=[0.1, 0.1],
-    w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
+    # w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
     norm=1 * GR_Joint_layer.n
 )
 Parallelfiber_Anti = Connection(

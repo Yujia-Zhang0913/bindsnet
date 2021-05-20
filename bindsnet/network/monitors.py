@@ -424,7 +424,6 @@ class Global_Monitor(AbstractMonitor):
 
         """
         return_logs = torch.cat(self.recording[var], 0)
-        # TODO do not clear
         # if self.time is None:
         #     self.recording[var] = []
         return return_logs
