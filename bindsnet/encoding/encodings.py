@@ -423,7 +423,9 @@ def Decode_Output(
         neural_num: int,
         time: int,
         dt: float = 1.0,
-        bound: float = 10.0,
+        bound_width = 10.0,
+        bound_high: float = 5.0,
+        bound_low: float = -5.0,
         device="cpu",
         approx=False,
         visual=False,
@@ -441,7 +443,7 @@ def Decode_Output(
     Output_01 = torch.sum(RATE)
     Output_01 /= neural_num
 
-    out = bound * Output_01
+    out = bound_width * Output_01 + bound_low
     if visual:
         print("-" * 10 + "Decode" + "-" * 10)
         pass
