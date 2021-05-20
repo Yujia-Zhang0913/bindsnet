@@ -439,6 +439,7 @@ class MusclePipeline(BasePipeline):
         self.planner.generate()
         self.env.start(sim_name='actuator_2')
         self.REC_DICT = {"error": 0.0, "curr": 0.0, "curr_anti": 0.0}
+        self.REC = {"Pressure": [], "Anti_Pressure": [], "input": [], "error": [], "tout": []}  # record
 
     def init_fn(self) -> None:
         pass
@@ -452,7 +453,7 @@ class MusclePipeline(BasePipeline):
         """
         # encode desired joint position
         # TODO only pos no vel
-        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now),num_group=10)
+        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now), num_group=10)
         desired_pos = bernoulli_RBF(datum=Input_RATE,
                                     neural_num=self.network.layers["MF_layer"].n,
                                     time=self.encoding_time,
@@ -489,8 +490,8 @@ class MusclePipeline(BasePipeline):
             "IO": IO_input,
             "MF_layer": desired_pos,
             "IO_Anti": IO_anti_input,
-            "IO_new":IO_input,
-            "IO_Anti_new":IO_anti_input
+            "IO_new": IO_input,
+            "IO_Anti_new": IO_anti_input
         }
         # run the network and write into the Info_network
         self.network_run(inputs)
@@ -507,6 +508,7 @@ class MusclePipeline(BasePipeline):
         self.step_now += 1
         if self.step_now >= (self.total_time / self.encoding_time):
             self.is_done = True
+        self.record_data()
         return 1
 
     def Sender(self):
@@ -536,7 +538,8 @@ class MusclePipeline(BasePipeline):
             DCN = self.network.monitors["DCN"].get("s")
             Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, bound=10)
             DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
-            Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time, self.network.dt, bound=10)
+            Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time,
+                                        self.network.dt, bound=10)
             # PK = self.network.monitors["PK"].get("s")
             # Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
             # PK_Anti = self.network.monitors["PK_Anti"].get("s")
@@ -603,3 +606,21 @@ class MusclePipeline(BasePipeline):
                                                                 self.Info_network["anti_network"]))
 
         pass
+
+    def record_data(self) -> None:
+        # record data and finally plot
+        self.REC["Pressure"].append(self.Info_network["network"])
+        self.REC["Anti_Pressure"].append(self.Info_network["anti_network"])
+        self.REC["input"].append(self.planner.pos_output(self.step_now - 1))
+        self.REC["error"].append(self.REC_DICT["error"])
+        self.REC["tout"].append(self.env.t_now)
+        pass
+
+    def data_analysis(self) -> None:
+        plt.ioff()
+        plt.figure()
+        for l in self.REC:
+            if l is "tout":
+                continue
+            plt.plot(self.REC["tout"], self.REC[l])
+        plt.show()

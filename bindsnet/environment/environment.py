@@ -294,6 +294,7 @@ class MuscleEnvironment:
         self.sim_name = None
         self.env_start_flag = True
         self.step_min = step_min
+        self.t_now = 0.0
 
     def start(self, sim_name: str = 'actuator'):
         # language=rst
@@ -329,14 +330,14 @@ class MuscleEnvironment:
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
             self.env_start_flag = False
         t_now = self.eng.workspace['tout'][-1]
-        t_now = self.eng.single(t_now)
+        self.t_now = self.eng.single(t_now)
 
-        while fabs(t_now - real_time) >= 0.05 and t_now < real_time:
+        while fabs(self.t_now - real_time) >= 0.05 and self.t_now < real_time:
             # self.eng.set_param(self.sim_name, "SimulationCommand", "start", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "step", nargout=0)
             self.eng.set_param(self.sim_name, "SimulationCommand", "pause", nargout=0)
             t_now = self.eng.workspace['tout'][-1]
-            t_now = self.eng.single(t_now)
+            self.t_now = self.eng.single(t_now)
         # load data from eng to Info
 
         self.Rec_eng_Info(record_list)
@@ -374,8 +375,8 @@ class MuscleEnvironment:
             # self.eng.workspace["anti_network"] = self.eng.double(self.Info_muscle["anti_network"])
             # # value = self.eng.double(self.Info_muscle["network"])
             # # value_2 = self.eng.double(self.Info_muscle["anti_network"])
-                self.eng.set_param('actuator_2/network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["network"])),nargout=0)
-                self.eng.set_param('actuator_2/anti_network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["anti_network"])),nargout=0)
+            #     self.eng.set_param('actuator_2/network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["network"])),nargout=0)
+            #     self.eng.set_param('actuator_2/anti_network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["anti_network"])),nargout=0)
 
     def reset(self) -> None:
         # language=rst

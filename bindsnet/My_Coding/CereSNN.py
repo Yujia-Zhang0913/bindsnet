@@ -40,11 +40,11 @@ MF_fiber = Group_Connection(
 Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
-    wmin=0,
+    wmin=1,
     wmax=5,
     update_rule=STDP,
     nu=[0.1, 0.1],
-    # w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
+    w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
     norm=1 * GR_Joint_layer.n
 )
 Parallelfiber_Anti = Connection(
@@ -204,12 +204,12 @@ def run_pipeline(pipeline, episode_count):
         # plt.ioff()
         #
         # plot_spikes(spikes)
+        pipeline.data_analysis()    # final plot
     pipeline.env.close()
 
 
 print("-" * 10 + "Training" + "-" * 10)
 run_pipeline(My_pipe, 1)
-plt.show()
 print("-" * 10 + "Testing" + "-" * 10)
 #
 # spikes = {
