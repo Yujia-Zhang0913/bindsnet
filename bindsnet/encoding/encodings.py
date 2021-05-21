@@ -228,7 +228,7 @@ def bernoulli_RBF(
     RATE = []
     for t in range(Time_network):
         for i in range(int(num_group)):
-            for n in range(int(neural_num/num_group)):
+            for n in range(int(neural_num / num_group)):
                 RATE.append(datum[i])
     # Get the rate matrix of (time/dt, neural_num)
     Final_Input = torch.Tensor(RATE)
@@ -246,7 +246,7 @@ def bernoulli_pre(
         datum: float,  # [n_1]
         num_group: int = 10,  # GR输入细胞的个数
         input_max=30,
-        max_pro =0.6,
+        max_pro=0.6,
         **kwargs
 ) -> list:
     # language=rst
@@ -284,7 +284,7 @@ def bernoulli_pre(
 
     for i in RBF:
         delta_X = datum.data - i
-        rate = max_pro*math.exp(-(delta_X * delta_X) / 2 / omega ** 2)
+        rate = max_pro * math.exp(-(delta_X * delta_X) / 2 / omega ** 2)
         Input_RATE.append(rate)
     return Input_RATE
 
@@ -404,7 +404,7 @@ def IO_Current2spikes(
 
         for i in range(neural_num):
             ref = torch.rand(1)
-            if max_prob*Current > ref:
+            if max_prob * Current > ref:
                 spike[i] = 1
             else:
                 spike[i] = 0
@@ -423,9 +423,8 @@ def Decode_Output(
         neural_num: int,
         time: int,
         dt: float = 1.0,
-        bound_width = 10.0,
-        bound_high: float = 5.0,
-        bound_low: float = -5.0,
+        bound_width=8.0,
+        bound_low: float = 0.0,
         device="cpu",
         approx=False,
         visual=False,

@@ -537,10 +537,10 @@ class MusclePipeline(BasePipeline):
 
         else:
             DCN = self.network.monitors["DCN"].get("s")
-            Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt, bound=10)
+            Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt)
             DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
             Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time,
-                                        self.network.dt, bound=10)
+                                        self.network.dt)
             # PK = self.network.monitors["PK"].get("s")
             # Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
             # PK_Anti = self.network.monitors["PK_Anti"].get("s")
@@ -615,7 +615,7 @@ class MusclePipeline(BasePipeline):
         # record data and finally plot
         self.REC["Pressure"].append(self.Info_network["network"])
         self.REC["Anti_Pressure"].append(self.Info_network["anti_network"])
-        self.REC["input"].append(self.planner.pos_output(self.step_now - 1))
+        self.REC["input"].append(0.5*self.planner.pos_output(self.step_now - 1))
         self.REC["error"].append(self.REC_DICT["error"])
         self.REC["tout"].append(self.env.t_now)
         pass
@@ -627,5 +627,5 @@ class MusclePipeline(BasePipeline):
             if l is "tout":
                 continue
             plt.plot(self.REC["tout"], self.REC[l])
-        plt.show()
+        plt.savefig('Values.png')
         self.REC = {"Pressure": [], "Anti_Pressure": [], "input": [], "error": [], "tout": []}  # record
