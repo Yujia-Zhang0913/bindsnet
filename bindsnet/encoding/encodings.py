@@ -404,7 +404,7 @@ def IO_Current2spikes(
 
         for i in range(neural_num):
             ref = torch.rand(1)
-            if Current > ref:
+            if max_prob*Current > ref:
                 spike[i] = 1
             else:
                 spike[i] = 0

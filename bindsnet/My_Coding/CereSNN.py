@@ -40,22 +40,22 @@ MF_fiber = Group_Connection(
 Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
-    wmin=1,
-    wmax=5,
+    wmin=0,
+    wmax=2,
     update_rule=STDP,
-    nu=[0.1, 0.1],
-    w=1 + torch.zeros(GR_Joint_layer.n, PK.n),
-    norm=1 * GR_Joint_layer.n
+    nu=[0.1, 0.5],
+    w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
+    # norm=0.3 * GR_Joint_layer.n
 )
 Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
-    wmin=1,
-    wmax=5,
-    nu=[0.1, 0.1],
+    wmin=0,
+    wmax=2,
+    nu=[0.1, 0.5],
     update_rule=STDP,
-    w=1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
-    norm=1 * GR_Joint_layer.n
+    w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
+    # norm=0.3 * GR_Joint_layer.n
 )
 
 Climbingfiber = Connection(
@@ -77,21 +77,21 @@ PK_DCN = Connection(
     source=PK,
     target=DCN,
     # w=-0.1 * torch.ones(PK.n, DCN.n)
-    norm=-10
+    norm=-0.1*PK.n
 )
 
 PK_DCN_Anti = Connection(
     source=PK_Anti,
     target=DCN_Anti,
     # w=-0.1 * torch.ones(PK_Anti.n, DCN_Anti.n)
-    norm=-10
+    norm=-0.1*PK.n
 )
 
 IO_DCN = Connection(
     source=IO_new,
     target=DCN,
     # w=0.1 * torch.ones(IO_new.n, DCN.n)
-    norm=10
+    norm=0.2*IO_new.n
 
 )
 
@@ -99,7 +99,7 @@ IO_DCN_Anti = Connection(
     source=IO_Anti_new,
     target=DCN_Anti,
     # w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
-    norm=10
+    norm=0.2*IO_Anti_new.n
 
 )
 
@@ -174,19 +174,20 @@ network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti_monitor")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
 
-T = TrajectoryPlanner()
+T = TrajectoryPlanner(plan_time=35)
 T.generate()
 
 env = MuscleEnvironment()
 My_pipe = MusclePipeline(network=network,
                          environment=env,
-                         save_interval=5,
+                         save_dir="network.pt",
+                         save_interval=10,
                          print_interval=1,
-                         plot_interval=1,
+                         plot_interval=5,
                          plot_config={"data_step": True, "data_length": 50, "volts_type": "line"},
                          planner=T,
                          encoding_time=50,
-                         total_time=5000,
+                         total_time=15000,
                          receive_list=["network", "anti_network"],
                          send_list=["pos", "vel"],
                          allow_gpu=False,
@@ -209,7 +210,7 @@ def run_pipeline(pipeline, episode_count):
 
 
 print("-" * 10 + "Training" + "-" * 10)
-run_pipeline(My_pipe, 1)
+run_pipeline(My_pipe, 5)
 print("-" * 10 + "Testing" + "-" * 10)
 #
 # spikes = {

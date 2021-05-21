@@ -168,7 +168,7 @@ class MatplotlibAnalyzer(PipelineAnalyzer):
 
     def plot_reward(
         self,
-        reward_list: list,
+        show_list: Dict,
         reward_window: int = None,
         tag: str = "reward",
         step: int = None,
@@ -186,32 +186,38 @@ class MatplotlibAnalyzer(PipelineAnalyzer):
             reward_im, reward_ax, reward_plot = self.plots[tag]
         else:
             reward_im, reward_ax, reward_plot = None, None, None
+        # reward_im, reward_ax, reward_plot = None, None, None
 
         # Compute moving average.
         if reward_window is not None:
             # Ensure window size > 0 and < size of reward list.
-            window = max(min(len(reward_list), reward_window), 0)
+            window = max(min(len(show_list["tout"]), reward_window), 0)
 
             # Fastest implementation of moving average.
             reward_list_ = (
-                pd.Series(reward_list)
+                pd.Series(show_list["tout"])
                 .rolling(window=window, min_periods=1)
                 .mean()
                 .values
             )
         else:
-            reward_list_ = reward_list[:]
+            # reward_list_ = reward_list[:]
+            pass
 
         if reward_im is None and reward_ax is None:
             reward_im, reward_ax = plt.subplots()
-            reward_ax.set_title("Accumulated reward")
-            reward_ax.set_xlabel("Episode")
-            reward_ax.set_ylabel("Reward")
-            (reward_plot,) = reward_ax.plot(reward_list_)
+            reward_ax.set_title("Important values")
+            reward_ax.set_xlabel("time step")
+            reward_ax.set_ylabel("Values")
+            (reward_plot,) = reward_ax.plot(show_list["error"])
+
 
             self.plots[tag] = reward_im, reward_ax, reward_plot
         else:
-            reward_plot.set_data(range(len(reward_list_)), reward_list_)
+            reward_plot.set_data(range(len(show_list["tout"])), show_list["tout"])
+            for l in show_list.keys():
+                if l is not "tout":
+                    reward_ax.plot(show_list["tout"],show_list[l])
             reward_ax.relim()
             reward_ax.autoscale_view()
 

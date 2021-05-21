@@ -19,8 +19,8 @@ import math
 
 
 class TrajectoryPlanner:
-    def __init__(self):
-        self.plan_time = 10
+    def __init__(self,plan_time):
+        self.plan_time = plan_time
         self.step_time = 0.1
         self.p = np.zeros((int(self.plan_time / self.step_time) + 1))
         self.v = np.zeros((int(self.plan_time / self.step_time) + 1))
@@ -470,7 +470,7 @@ class MusclePipeline(BasePipeline):
         self.Sender()
         error = self.kx * (self.planner.pos_output(self.step_now) - self.Info_network["pos"])
 
-        curr, curr_anti = Error2IO_Current(error)
+        curr, curr_anti = Error2IO_Current(datum=error,error_max=2.5)
         self.REC_DICT["error"] = error
         self.REC_DICT["curr"] = curr
         self.REC_DICT["curr_anti"] = curr_anti
@@ -479,12 +479,13 @@ class MusclePipeline(BasePipeline):
                                      neural_num=self.network.layers["IO"].n,
                                      time=self.encoding_time,
                                      dt=self.network.dt,
-                                     max_prob=1)
+                                     max_prob=0.9
+                                     )
         IO_anti_input = IO_Current2spikes(curr_anti,
                                           neural_num=self.network.layers["IO"].n,
                                           time=self.encoding_time,
                                           dt=self.network.dt,
-                                          max_prob=1
+                                          max_prob=0.9
                                           )
         inputs = {
             "IO": IO_input,
@@ -559,6 +560,7 @@ class MusclePipeline(BasePipeline):
         self.network.reset_state_variables()
         self.step_now = 0
         self.is_done = False
+        super().reset_state_variables()
 
     def plots(self, batch=1, *args) -> None:
         # language=rst
@@ -579,6 +581,8 @@ class MusclePipeline(BasePipeline):
                 if self.step_count % item == 0:
                     self.analyzer.plot_spikes(self.get_spike_data())
                     self.analyzer.plot_voltages(*self.get_voltage_data())
+                    self.analyzer.plot_reward(show_list=self.REC,tag="Values")
+
             # elif key == "reward_eps" and item is not None:
             #     if self.episode % item == 0 and done:
             #         self.analyzer.plot_reward(self.reward_list)
@@ -624,3 +628,4 @@ class MusclePipeline(BasePipeline):
                 continue
             plt.plot(self.REC["tout"], self.REC[l])
         plt.show()
+        self.REC = {"Pressure": [], "Anti_Pressure": [], "input": [], "error": [], "tout": []}  # record
