@@ -40,19 +40,19 @@ MF_fiber = Group_Connection(
 Parallelfiber = Connection(
     source=GR_Joint_layer,
     target=PK,
-    wmin=0,
-    wmax=2,
+    wmin=0.1,
+    wmax=5,
     update_rule=STDP,
-    nu=[0.1, 0.5],
+    nu=[0.01, 0.05],
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
     # norm=0.3 * GR_Joint_layer.n
 )
 Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
-    wmin=0,
-    wmax=2,
-    nu=[0.1, 0.5],
+    wmin=0.1,
+    wmax=5,
+    nu=[0.01, 0.05],
     update_rule=STDP,
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n),
     # norm=0.3 * GR_Joint_layer.n
@@ -174,7 +174,7 @@ network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti_monitor")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
 
-T = TrajectoryPlanner(plan_time=35)
+T = TrajectoryPlanner(plan_time=60)
 T.generate()
 
 env = MuscleEnvironment()

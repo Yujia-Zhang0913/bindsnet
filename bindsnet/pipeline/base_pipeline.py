@@ -90,7 +90,7 @@ class BasePipeline:
         self.test_interval = kwargs.get("test_interval", None)
         self.plot_interval = kwargs.get("test_interval", None)
         self.step_count = 0
-        self.epoch = 0
+        self.epoch = -1
         self.init_fn()
         self.clock = time.time()
         self.allow_gpu = kwargs.get("allow_gpu", True)
@@ -109,8 +109,9 @@ class BasePipeline:
         """
         self.network.reset_state_variables()
         self.step_count = 0
-        if self.epoch is not 0:
-            self.epoch += 1
+
+        self.epoch += 1
+        self.save_dir = "network_epoch_{}.pt".format(self.epoch)
 
     def step(self, batch: Any, **kwargs) -> Any:
         # language=rst

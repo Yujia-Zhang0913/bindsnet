@@ -368,15 +368,17 @@ class MuscleEnvironment:
         else:
             if self.env_start_flag is False:
                 pass
-            # # for c in command_list:
-            # #     assert isinstance(c, str), "Invaild command key! Key must be string type"
-            # #     assert self.Info_muscle.get(c) is not None, "No such key in Info_muscle"
-            # self.eng.workspace["network"] = self.eng.double(self.Info_muscle["network"])
-            # self.eng.workspace["anti_network"] = self.eng.double(self.Info_muscle["anti_network"])
-            # # value = self.eng.double(self.Info_muscle["network"])
-            # # value_2 = self.eng.double(self.Info_muscle["anti_network"])
-            #     self.eng.set_param('actuator_2/network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["network"])),nargout=0)
-            #     self.eng.set_param('actuator_2/anti_network', 'Value', self.eng.num2str(self.eng.double(self.Info_muscle["anti_network"])),nargout=0)
+                # # for c in command_list:
+                # #     assert isinstance(c, str), "Invaild command key! Key must be string type"
+                # #     assert self.Info_muscle.get(c) is not None, "No such key in Info_muscle"
+                # self.eng.workspace["network"] = self.eng.double(self.Info_muscle["network"])
+                # self.eng.workspace["anti_network"] = self.eng.double(self.Info_muscle["anti_network"])
+                # # value = self.eng.double(self.Info_muscle["network"])
+                # # value_2 = self.eng.double(self.Info_muscle["anti_network"])
+                self.eng.set_param('actuator_2/network', 'Value',
+                                   self.eng.num2str(self.eng.double(self.Info_muscle["network"])), nargout=0)
+                self.eng.set_param('actuator_2/anti_network', 'Value',
+                                   self.eng.num2str(self.eng.double(self.Info_muscle["anti_network"])), nargout=0)
 
     def reset(self) -> None:
         # language=rst
