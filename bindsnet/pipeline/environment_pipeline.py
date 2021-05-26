@@ -19,7 +19,7 @@ import math
 
 
 class TrajectoryPlanner:
-    def __init__(self,plan_time):
+    def __init__(self, plan_time):
         self.plan_time = plan_time
         self.step_time = 0.1
         self.p = np.zeros((int(self.plan_time / self.step_time) + 1))
@@ -379,6 +379,8 @@ class MusclePipeline(BasePipeline):
             receive_list: list,
             kv: float,
             kx: float,
+            error_max:float=8,
+            out_max:float=3,
             **kwargs,
     ):
         # language=rst
@@ -427,7 +429,8 @@ class MusclePipeline(BasePipeline):
 
         self.kv = kv
         self.kx = kx
-
+        self.error_max = error_max
+        self.out_max = out_max
         self.is_done = False
         # set GPU or CPU
         if torch.cuda.is_available() and self.allow_gpu:
@@ -470,7 +473,7 @@ class MusclePipeline(BasePipeline):
         self.Sender()
         error = self.kx * (self.planner.pos_output(self.step_now) - self.Info_network["pos"])
 
-        curr, curr_anti = Error2IO_Current(datum=error,error_max=2.5)
+        curr, curr_anti = Error2IO_Current(datum=error, error_max=self.error_max)
         self.REC_DICT["error"] = error
         self.REC_DICT["curr"] = curr
         self.REC_DICT["curr_anti"] = curr_anti
@@ -479,7 +482,8 @@ class MusclePipeline(BasePipeline):
                                      neural_num=self.network.layers["IO"].n,
                                      time=self.encoding_time,
                                      dt=self.network.dt,
-                                     max_prob=0.9
+                                     max_prob=0.9,
+
                                      )
         IO_anti_input = IO_Current2spikes(curr_anti,
                                           neural_num=self.network.layers["IO"].n,
@@ -537,10 +541,11 @@ class MusclePipeline(BasePipeline):
 
         else:
             DCN = self.network.monitors["DCN"].get("s")
-            Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt,bound_width=2)
+            Output = Decode_Output(DCN, self.network.layers["DCN"].n, self.encoding_time, self.network.dt,
+                                   bound_width=self.out_max)
             DCN_Anti = self.network.monitors["DCN_Anti"].get("s")
             Output_Anti = Decode_Output(DCN_Anti, self.network.layers["DCN_Anti"].n, self.encoding_time,
-                                        self.network.dt,bound_width=2)
+                                        self.network.dt, bound_width=self.out_max)
             # PK = self.network.monitors["PK"].get("s")
             # Output = Decode_Output(PK, self.network.layers["PK"].n, self.encoding_time, self.network.dt, 1)
             # PK_Anti = self.network.monitors["PK_Anti"].get("s")
@@ -581,7 +586,7 @@ class MusclePipeline(BasePipeline):
                 if self.step_count % item == 0:
                     self.analyzer.plot_spikes(self.get_spike_data())
                     self.analyzer.plot_voltages(*self.get_voltage_data())
-                    self.analyzer.plot_reward(show_list=self.REC,tag="Values")
+                    self.analyzer.plot_reward(show_list=self.REC, tag="Values")
 
             # elif key == "reward_eps" and item is not None:
             #     if self.episode % item == 0 and done:
@@ -615,7 +620,7 @@ class MusclePipeline(BasePipeline):
         # record data and finally plot
         self.REC["Pressure"].append(self.Info_network["network"])
         self.REC["Anti_Pressure"].append(self.Info_network["anti_network"])
-        self.REC["input"].append(0.5*self.planner.pos_output(self.step_now - 1))
+        self.REC["input"].append(0.5 * self.planner.pos_output(self.step_now - 1))
         self.REC["error"].append(self.REC_DICT["error"])
         self.REC["tout"].append(self.env.t_now)
         pass

@@ -19,7 +19,7 @@ dp_crack = 1e4; % Pa
 dp_max = 2e4; % Pa
 area_max = 1e-5; % m^2
 area_leak = 1e-10; % m^2
-area_restrict = 1e-6; % m^2 
+area_restrict =1e-6; % m^2 
 
 % Translational dampers
 D_translation = 1; % N/(m/s)
@@ -41,5 +41,6 @@ theta_lower = 0; % rad
 % Environment
 T_atm = 293.15; % K
 p_atm = 0.101325; % MPa
-network = 0;
-anti_network = 0;
+network=double(0.0);
+anti_network = double(0.0);
+tout = [0;0];

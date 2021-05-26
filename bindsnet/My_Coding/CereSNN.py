@@ -91,7 +91,7 @@ IO_DCN = Connection(
     source=IO_new,
     target=DCN,
     # w=0.1 * torch.ones(IO_new.n, DCN.n)
-    norm=0.2*IO_new.n
+    norm=0.1*IO_new.n
 
 )
 
@@ -99,7 +99,7 @@ IO_DCN_Anti = Connection(
     source=IO_Anti_new,
     target=DCN_Anti,
     # w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
-    norm=0.2*IO_Anti_new.n
+    norm=0.1*IO_Anti_new.n
 
 )
 
@@ -173,10 +173,8 @@ network.add_monitor(monitor=IO_monitor, name="IO_monitor")
 network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti_monitor")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
-
 T = TrajectoryPlanner(plan_time=60)
 T.generate()
-
 env = MuscleEnvironment()
 My_pipe = MusclePipeline(network=network,
                          environment=env,
@@ -193,7 +191,10 @@ My_pipe = MusclePipeline(network=network,
                          allow_gpu=False,
                          kv=1,
                          kx=1,
+                         error_max=8,
+                         out_max=4.5,
                          )
+
 
 
 def run_pipeline(pipeline, episode_count):
@@ -210,7 +211,7 @@ def run_pipeline(pipeline, episode_count):
 
 
 print("-" * 10 + "Training" + "-" * 10)
-run_pipeline(My_pipe, 20)
+run_pipeline(My_pipe, 1)
 print("-" * 10 + "Testing" + "-" * 10)
 #
 # spikes = {

@@ -9,7 +9,8 @@ from bindsnet.network.monitors import Monitor, Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
 from bindsnet.utils import Error2IO_Current
-from bindsnet.encoding import poisson, bernoulli
+from bindsnet.encoding import poisson, bernoulli, bernoulli_pre
+import numpy as np
 
 time = 50
 network = Network(dt=1)
@@ -29,7 +30,7 @@ Parallelfiber = Connection(
     wmin=0,
     wmax=1,
     update_rule=STDP,
-    nu=[0.1,0.1],
+    nu=[0.1, 0.1],
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK.n),
 )
 
@@ -38,7 +39,7 @@ Parallelfiber_Anti = Connection(
     source=GR_Joint_layer,
     target=PK_Anti,
     wmin=0,
-    nu=[0.1,0.1],
+    nu=[0.1, 0.1],
     update_rule=STDP,
     w=0.1 + torch.zeros(GR_Joint_layer.n, PK_Anti.n)
 )
@@ -151,13 +152,12 @@ network.add_monitor(monitor=IO_Our_monitor, name="IO_Our_Monitor")
 
 # 单次网络输入测试
 encoding_time = 50
-dt = 0.1
+dt = 1
 
 # 输入信号编码测试
 neu_GR = 100
-a = torch.Tensor([0.5])
-
-data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)  # Input_DATA, neural_num, time, dt
+data = bernoulli_pre(0.5)
+data_Joint = bernoulli_RBF(datum=data, neural_num=neu_GR, time=time, dt=1)  # Input_DATA, neural_num, time, dt
 
 # 监督信号编码测试
 neu_IO = 32
@@ -170,18 +170,20 @@ print("Curr_Anti: {}".format(Curr_Anti))
 IO_Input = IO_Current2spikes(Curr, neu_IO, encoding_time, dt)  # Supervise_DATA, neural_num, time, dt
 IO_Anti_Input = IO_Current2spikes(Curr_Anti, neu_IO, encoding_time, dt)
 
-for i in range(1):
+for i in range(10):
     print('-' * 10 + str(i) + '-' * 10)
-    if i > 5:
-        Curr = torch.Tensor([0])
-        Curr_Anti = torch.Tensor([0])
-        a = torch.Tensor([0.5])
-        data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)  # Input_DATA, neural_num, time, dt
+    if i % 2:
+        Curr = torch.Tensor([0.1*i])
+        Curr_Anti = torch.Tensor([0.1*i])
+        data = 0.1*i
+        data = bernoulli_pre(data)
+        data_Joint = bernoulli_RBF(datum=data, neural_num=neu_GR, time=time, dt=1)  # Input_DATA, neural_num, time, dt
     else:
-        a = torch.Tensor([1])
-        data_Joint = bernoulli_RBF(a, neu_GR, encoding_time, dt)  # Input_DATA, neural_num, time, dt
-        Curr = torch.Tensor([0.5])
-        Curr_Anti = torch.Tensor([0.5])
+        data = 0.1*i
+        data = bernoulli_pre(data)
+        data_Joint = bernoulli_RBF(datum=data, neural_num=neu_GR, time=time, dt=1)  # Input_DATA, neural_num, time, dt
+        Curr = torch.Tensor([0.1*i])
+        Curr_Anti = torch.Tensor([0.1*i])
         # 根据监督信号生成电流值 相同监督相同电流
     # Curr, Curr_Anti = Error2IO_Current(supervise)
     print("Curr: {}".format(Curr))
@@ -194,11 +196,12 @@ for i in range(1):
         "GR_Joint_layer": data_Joint,
         "IO_Anti": IO_Anti_Input
     }
+    network.learning = False
     network.run(inputs=inputs, time=time)
 
 spikes = {
     "IO": IO_Our_monitor.get("s"),
-    "GR_Joint_layer":GR_monitor.get("s"),
+    "GR_Joint_layer": GR_monitor.get("s"),
     "DCN": DCN_monitor.get("s")
     # "DCN_Anti":DCN_Anti_monitor.get("s")
 }

@@ -209,12 +209,12 @@ class MatplotlibAnalyzer(PipelineAnalyzer):
             reward_ax.set_title("Important values")
             reward_ax.set_xlabel("time step")
             reward_ax.set_ylabel("Values")
-            (reward_plot,) = reward_ax.plot(show_list["error"])
+            (reward_plot,) = reward_ax.plot( show_list["tout"],show_list["error"])
 
 
             self.plots[tag] = reward_im, reward_ax, reward_plot
         else:
-            reward_plot.set_data(range(len(show_list["tout"])), show_list["tout"])
+            # reward_plot.set_data(range(len(show_list["tout"])), show_list["tout"])
             for l in show_list.keys():
                 if l is not "tout":
                     reward_ax.plot(show_list["tout"],show_list[l])

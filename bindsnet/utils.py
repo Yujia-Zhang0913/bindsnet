@@ -327,6 +327,8 @@ def Plot_Kernel(
         K.create_result(delta_t=i)
         y.append(K.result)
     plt.plot(x,y)
+    plt.xlabel ("time since IO spike arrival(s)")
+    plt.ylabel ("amount of LTD")
     plt.show()
 
 
