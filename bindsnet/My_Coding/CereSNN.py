@@ -88,18 +88,18 @@ PK_DCN_Anti = Connection(
 )
 
 IO_DCN = Connection(
-    source=IO_new,
+    source=GR_Joint_layer,
     target=DCN,
     # w=0.1 * torch.ones(IO_new.n, DCN.n)
-    norm=0.1*IO_new.n
+    norm=0.5*GR_Joint_layer.n
 
 )
 
 IO_DCN_Anti = Connection(
-    source=IO_Anti_new,
+    source=GR_Joint_layer,
     target=DCN_Anti,
     # w=0.1 * torch.ones(IO_Anti_new.n, DCN_Anti.n)
-    norm=0.1*IO_Anti_new.n
+    norm=0.5*GR_Joint_layer.n
 
 )
 
@@ -122,8 +122,8 @@ network.add_connection(connection=Parallelfiber_Anti, source="GR_Joint_layer", t
 
 network.add_connection(connection=PK_DCN, source="PK", target="DCN")
 network.add_connection(connection=PK_DCN_Anti, source="PK_Anti", target="DCN_Anti")
-network.add_connection(connection=IO_DCN, source="IO_new", target="DCN")
-network.add_connection(connection=IO_DCN_Anti, source="IO_Anti_new", target="DCN_Anti")
+network.add_connection(connection=IO_DCN, source="GR_Joint_layer", target="DCN")
+network.add_connection(connection=IO_DCN_Anti, source="GR_Joint_layer", target="DCN_Anti")
 
 MF_monitor = Monitor(
     obj=MF_layer,
@@ -173,13 +173,13 @@ network.add_monitor(monitor=IO_monitor, name="IO_monitor")
 network.add_monitor(monitor=IO_Anti_monitor, name="IO_Anti_monitor")
 network.add_monitor(monitor=DCN_monitor, name="DCN")
 network.add_monitor(monitor=DCN_Anti_monitor, name="DCN_Anti")
-T = TrajectoryPlanner(plan_time=60)
+T = TrajectoryPlanner(plan_time=200)
 T.generate()
 env = MuscleEnvironment()
 My_pipe = MusclePipeline(network=network,
                          environment=env,
                          save_dir="network.pt",
-                         save_interval=50,
+                         save_interval=20,
                          print_interval=1,
                          plot_interval=None,
                          plot_config={"data_step": True, "data_length": 50, "volts_type": "line"},
@@ -191,7 +191,7 @@ My_pipe = MusclePipeline(network=network,
                          allow_gpu=False,
                          kv=1,
                          kx=1,
-                         error_max=8,
+                         error_max=2,
                          out_max=4.5,
                          )
 
@@ -207,11 +207,11 @@ def run_pipeline(pipeline, episode_count):
         #
         # plot_spikes(spikes)
         pipeline.data_analysis()    # final plot
-    pipeline.env.close()
+    # pipeline.env.close()
 
 
 print("-" * 10 + "Training" + "-" * 10)
-run_pipeline(My_pipe, 1)
+run_pipeline(My_pipe, 4)
 print("-" * 10 + "Testing" + "-" * 10)
 #
 # spikes = {

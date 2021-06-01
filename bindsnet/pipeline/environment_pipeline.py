@@ -35,7 +35,7 @@ class TrajectoryPlanner:
         #     else:
         #         self.p[i] = max_theta
         for i in range(0, int(self.plan_time / self.step_time + 1)):
-            self.p[i] = 10 * sin(0.1 * 0.2 * i - pi / 2) + 10
+            self.p[i] = 2.4 * sin(0.1 * 0.2 * i - pi / 2) + 2.4
 
     def pos_output(self, n_step) -> float:
         """
@@ -379,8 +379,8 @@ class MusclePipeline(BasePipeline):
             receive_list: list,
             kv: float,
             kx: float,
-            error_max:float=8,
-            out_max:float=3,
+            error_max: float = 8,
+            out_max: float = 3,
             **kwargs,
     ):
         # language=rst
@@ -495,8 +495,8 @@ class MusclePipeline(BasePipeline):
             "IO": IO_input,
             "MF_layer": desired_pos,
             "IO_Anti": IO_anti_input,
-            "IO_new": IO_input,
-            "IO_Anti_new": IO_anti_input
+            # "IO_new": IO_input,
+            # "IO_Anti_new": IO_anti_input
         }
         # run the network and write into the Info_network
         self.network_run(inputs)
@@ -609,7 +609,7 @@ class MusclePipeline(BasePipeline):
         print("Curr to spikes")
         print("-" * 10 + "Net running" + "-" * 10)
         # print("Weight:{}".format(self.network.connections[("GR_Joint_layer", "PK")].w))
-        # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK")].w))
+        print("weight:{}".format(self.network.connections[("GR_Joint_layer", "PK")].w))
         # print("weight:{}".format(self.network.connections[("GR_Joint_layer","PK_Anti")].w))
         print("Pressure_add: {}   Anti_Pressure_add: {}".format(self.Info_network["network"],
                                                                 self.Info_network["anti_network"]))
@@ -634,3 +634,7 @@ class MusclePipeline(BasePipeline):
             plt.plot(self.REC["tout"], self.REC[l])
         plt.savefig('Values_{}.png'.format(self.epoch))
         self.REC = {"Pressure": [], "Anti_Pressure": [], "input": [], "error": [], "tout": []}  # record
+        self.env.eng.save("valuess_{}".format(self.epoch), "valuess", nargout=0)
+        self.env.eng.save("tout_{}".format(self.epoch), "tout", nargout=0)
+        self.env.eng.save("pos_{}".format(self.epoch), "pos", nargout=0)
+        self.env.eng.save("simlog_{}".format(self.epoch), "simlog", nargout=0)

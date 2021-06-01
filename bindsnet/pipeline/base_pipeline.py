@@ -151,7 +151,6 @@ class BasePipeline:
 
         if self.test_interval is not None and self.step_count % self.test_interval == 0:
             self.test()
-
         return step_out
 
     def get_spike_data(self) -> Dict[str, torch.Tensor]:
