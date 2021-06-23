@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from bindsnet.encoding.encodings import bernoulli_RBF, poisson_IO, IO_Current2spikes, Decode_Output
 from bindsnet.network import Network
 from bindsnet.network.nodes import Input, LIFNodes, LIF_Train
-from bindsnet.network.topology import Connection, Group_Connection
+from bindsnet.network.topology import Connection, Group_Connection,SparseConnection
 from bindsnet.network.monitors import Monitor, Global_Monitor, Our_Monitor
 from bindsnet.analysis.plotting import plot_spikes, plot_voltages, plot_weights
 from bindsnet.learning import STDP, IO_Record, PostPre, NoOp
@@ -29,10 +29,10 @@ IO_Anti_new = Input(n=80, traces=True, refrac=0)
 DCN = LIFNodes(n=80, traces=True, refrac=0)
 DCN_Anti = LIFNodes(n=80, trace=True, refrac=0)
 
-MF_fiber = Group_Connection(
+MF_fiber = SparseConnection(
     source=MF_layer,
     target=GR_Joint_layer,
-    norm=5
+    sparsity = 0.5
 
 )
 
@@ -191,7 +191,7 @@ My_pipe = MusclePipeline(network=network,
                          allow_gpu=False,
                          kv=1,
                          kx=1,
-                         error_max=2,
+                         error_max=0.5,
                          out_max=4.5,
                          )
 

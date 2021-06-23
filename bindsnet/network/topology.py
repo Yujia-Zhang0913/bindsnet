@@ -981,7 +981,8 @@ class SparseConnection(AbstractConnection):
         :return: Incoming spikes multiplied by synaptic weights (with or without
             decaying spike activation).
         """
-        return torch.mm(self.w, s.unsqueeze(-1).float()).squeeze(-1)
+        a = s
+        return torch.mm(s.float(),self.w.to_dense())
 
     def update(self, **kwargs) -> None:
         # language=rst

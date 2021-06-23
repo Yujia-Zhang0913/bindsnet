@@ -456,12 +456,12 @@ class MusclePipeline(BasePipeline):
         """
         # encode desired joint position
         # TODO only pos no vel
-        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now), num_group=10)
+        Input_RATE = bernoulli_pre(datum=self.planner.pos_output(self.step_now), num_group=1)
         desired_pos = bernoulli_RBF(datum=Input_RATE,
                                     neural_num=self.network.layers["MF_layer"].n,
                                     time=self.encoding_time,
                                     dt=self.network.dt,
-                                    num_group=10
+                                    num_group=1
                                     )
 
         # desired_vel =self.encoding(self.planner.vel_output(self.step_now),
