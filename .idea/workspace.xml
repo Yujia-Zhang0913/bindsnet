@@ -29,15 +29,9 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="Done with the Decode_Output function">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="e4363d73-42c6-4fb0-8aa1-7d933d673379" name="Default Changelist" comment="change connections between MF and GR to sparse connection">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actuator_2.slx" beforeDir="false" afterPath="$PROJECT_DIR$/actuator_2.slx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/CereSNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/CereSNN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bindsnet/My_Coding/network_epoch_0.pt" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/My_Coding/network_epoch_0.pt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/environment/environment.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/environment/environment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/network/topology.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/network/topology.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bindsnet/pipeline/environment_pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/bindsnet/pipeline/environment_pipeline.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +66,18 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/bindsnet/encoding/encodings.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/network/network.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/network/nodes.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/My_Coding/CereSNN.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/environment/environment.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../../Anaconda/Lib/site-packages/torch/_C/_VariableFunctions.pyi" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/pipeline/base_pipeline.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/pipeline/environment_pipeline.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/PyCharmCE2021.1/python_stubs/1310655275/torch/_C/_TensorBase.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/bindsnet/network/topology.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectId" id="1qBnZEEuhJgkquF8pG6lvqq33DP" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -85,7 +91,7 @@
     <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../CereSNN/bindsnet/encoding/encodings.py" />
-    <property name="settings.editor.selected.configurable" value="pyconsole" />
+    <property name="settings.editor.selected.configurable" value="com.gitee.ui.GiteeSettingsConfigurable" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/../../CereSNN/bindsnet/encoding/encodings.py" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -245,11 +251,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.CereSNN" />
       <item itemvalue="Python.Cerebellum" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.CereSNN" />
       <item itemvalue="Python.My_test" />
       <item itemvalue="Python.breakout" />
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.test_2021304" />
       <item itemvalue="Python.utils" />
     </list>
@@ -580,7 +586,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622529824271</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="change connections between MF and GR to sparse connection">
+      <created>1624422760364</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1624422760364</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -604,7 +617,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="master" />
+                        <option value="origin/master" />
                       </list>
                     </value>
                   </entry>
@@ -619,7 +632,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="global monitor" />
     <MESSAGE value="fix a bug about type of &quot;time&quot; in encoding" />
     <MESSAGE value="basically done with the pipeline" />
     <MESSAGE value="matlab_file_here" />
@@ -644,7 +656,8 @@
     <MESSAGE value="net version 3.0" />
     <MESSAGE value="version n" />
     <MESSAGE value="add record for data in matlab" />
-    <option name="LAST_COMMIT_MESSAGE" value="add record for data in matlab" />
+    <MESSAGE value="change connections between MF and GR to sparse connection" />
+    <option name="LAST_COMMIT_MESSAGE" value="change connections between MF and GR to sparse connection" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
