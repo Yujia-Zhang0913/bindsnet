@@ -1,0 +1,5 @@
+.idea
+*.slx
+*.pt
+venv
+bindsnet/.idea
