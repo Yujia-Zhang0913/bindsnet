@@ -1,5 +1,6 @@
 .idea
-*.slx
+.slxc
 *.pt
 venv
 bindsnet/.idea
+slprj
