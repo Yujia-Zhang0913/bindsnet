@@ -1,7 +1,9 @@
 .idea
-.slxc
-.slx
+*.slxc
+*.slx
+*.slx.r2019b
 PTH
 venv
 bindsnet/.idea
 slprj
+__pycache__
